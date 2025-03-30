@@ -2,22 +2,22 @@ import buildUrl from "build-url";
 import {headers} from "next/headers"
 
 async function getSpotifyLoginUri(): Promise<string> {
-  let headerList = await headers();
-  let origin = headerList.get("x-location-origin");
-  let redirectUri: string = `${origin}/redirect`
-  let queryParams: any = {
+  const headerList = await headers();
+  const origin = headerList.get("x-location-origin");
+  const redirectUri: string = `${origin}/redirect`
+  const queryParams = {
     client_id: "e260bec14eb448219fd414c6d880cd8d",
     redirect_uri: redirectUri,
     response_type: 'token',
     scope: 'user-read-currently-playing'
   }
-  let spotifyAuthUri: string = "https://accounts.spotify.com/authorize"
+  const spotifyAuthUri: string = "https://accounts.spotify.com/authorize"
   console.log(redirectUri);
   return  buildUrl(spotifyAuthUri, {queryParams})
 }
 
 export default async function Home() {
-  let loginUri = await getSpotifyLoginUri();
+  const loginUri = await getSpotifyLoginUri();
   
   return (
     <div className="m-auto">

@@ -1,0 +1,64 @@
+.bar-container {
+    position: static;
+    width:10px;
+    margin-right: 2.5px;
+    margin-left: 2.5px;
+    height: 60px;
+}
+
+.bar {
+    border-radius: 5px;
+    display: block;
+    position: static;
+    width: 10px;
+    height: 6px;
+    margin-top: 22px;
+    overflow: hidden;
+    background: #dadade;
+    color: transparent;
+    animation-name: pulse;
+    animation-duration: 1.25s;
+}
+
+.now.playing .bar {
+    animation-iteration-count: infinite;
+}
+
+.paused.playing .bar {
+    animation-iteration-count: 1;
+}
+
+.n1 {
+    animation-delay: 0.5s;
+}
+
+.n2 {
+    animation-delay: 1.2s;
+}
+
+.n3 {
+    animation-delay: 0.9s;
+}
+
+@keyframes pulse {
+    0% {
+        height: 16px;
+        margin-top: 17px;
+    }
+    25% {
+        height: 40px;
+        margin-top: 5px;
+    }
+    50% {
+        height: 20px;
+        margin-top: 15px;
+    }
+    75% {
+        height: 50px;
+        margin-top: 0px;
+    }
+    100% {
+        height: 16px;
+        margin-top: 17px;
+    }
+}

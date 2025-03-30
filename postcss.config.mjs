@@ -1,5 +1,10 @@
 const config = {
-  plugins: ["@tailwindcss/postcss"],
+  plugins: {
+    "@tailwindcss/postcss": {},
+    "@csstools/postcss-oklab-function" : {
+      preserve: true
+    }
+  },
 };
 
 export default config;
