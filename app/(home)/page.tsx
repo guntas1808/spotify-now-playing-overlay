@@ -1,5 +1,6 @@
 import buildUrl from "build-url";
 import {headers} from "next/headers"
+import Image from "next/image";
 
 async function getSpotifyLoginUri(): Promise<string> {
   const headerList = await headers();
@@ -20,11 +21,20 @@ export default async function Home() {
   const loginUri = await getSpotifyLoginUri();
   
   return (
-    <div className="m-auto">
-      <a href={loginUri}
-        className="text-3xl border rounded-full pt-5 pb-5 pl-7 pr-7">
-        Login to Spotify
+    <>
+      <div className="flex-row flex m-auto">
+        <figure className="p-2">
+          <Image src="/spotify.png" 
+                  alt="Spotify Logo" 
+                  width={100} 
+                  height={100}
+                  className="m-auto"/>
+        </figure>
+        <a href={loginUri}
+          className="btn btn-soft btn-xl btn-success text-4xl p-12 rounded-full ml-2 m-auto">
+          Login to Spotify
         </a>
-    </div>
+      </div>
+    </>
   );
 }

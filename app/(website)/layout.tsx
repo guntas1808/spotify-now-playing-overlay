@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
+import "../globals.css"
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -18,30 +19,33 @@ export default function WebsiteLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html data-theme="light" lang="en">
+    <html data-theme="dark" lang="en">
       <body 
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}>      
-        <header className="p-5 h-50 flex bg-gray-50">
-          <div className="card card-side">
-            <figure>
-              <Image
-                width={60}
-                height={60}
-                src="/spotify.png" 
-                alt=""/>
-            </figure>
+        <div className="h-screen w-full">
+          <header className="h-[20%] p-5 flex bg-neutral">
+            <div className="card card-side">
+              <figure>
+                <Image
+                  width={90}
+                  height={90}
+                  src="/spotify.png" 
+                  alt=""/>
+              </figure>
+            </div>
+            <Link
+              className="my-auto ml-6 text-5xl text" 
+              href="/">
+                Spotify Overlay for OBS
+            </Link>
+          </header>
+          <div className="h-[70%]">
+            {children}
           </div>
-          <Link
-            className="my-auto ml-6 text-6xl text-green-500" 
-            href="/">
-              Spotify Overlay
-          </Link>
-        </header>
-        <div className="flex h-200">
-          {children}
+          <footer className="h-[10%] bg-neutral">
+            dsfafd
+          </footer>
         </div>
-        <footer>
-        </footer>
       </body>
     </html>
   );

@@ -1,7 +1,12 @@
-import React from 'react'
-import "./style.css"
+import React from "react";
+import "./style.css";
 
-const PlayingAnimation = () => {
+type Props = {
+  color: string;
+};
+
+const PlayingAnimation = (props: Props) => {
+  const baseColorHex = props.color;
   return (
     <>
       <div className="now playing
@@ -11,14 +16,23 @@ const PlayingAnimation = () => {
                   w-auto h-[65]
                   bg-[#4f5057]
                   rounded-xl
-                  p-[7.5]" 
-            id="music">
-        <div className="bar-container"><span className="bar n1">A</span></div>
-        <div className="bar-container"><span className="bar n2">c</span></div>
-        <div className="bar-container"><span className="bar n3">D</span></div>
+                  p-[7.5]"
+        id="music"
+        style={{
+          backgroundColor: `color-mix(in srgb, ${baseColorHex} 20%, transparent)`,
+        }}
+      >
+        {[1, 2, 3].map((idx) => (
+          <div key={idx} className="bar-container">
+            <span
+              className={`bar n${idx} bg-[]`}
+              style={{ backgroundColor: baseColorHex }}
+            />
+          </div>
+        ))}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default PlayingAnimation
+export default PlayingAnimation;

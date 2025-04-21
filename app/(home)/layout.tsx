@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css"
+import "../globals.css"
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -18,10 +18,11 @@ export default function NowPlayingLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html data-theme="light" lang="en">
-        <body 
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}>         
+    <html data-theme="dark" lang="en">
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <div className="h-screen w-screen flex flex-col">
             {children}
+          </div>
         </body>
     </html>
   );

@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
+import "../globals.css"
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -18,7 +19,7 @@ export default function NowPlayingLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html data-theme="dark" lang="en">
+    <html className="bg-transparent" lang="en">
         <body 
             className={`${geistSans.variable} ${geistMono.variable} bg-transparent antialiased`}>         
             <Suspense>

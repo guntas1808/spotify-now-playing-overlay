@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from "next/navigation";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { useEffect, useReducer, useRef } from "react";
 import SpotifyApiResponseJson from "./schema";
 import PlayingAnimation from "./_playingAnimation/PlayingAnimation";
@@ -25,6 +25,12 @@ class Player {
 const spotiyNowPlayingEndpoint = "https://api.spotify.com/v1/me/player/currently-playing";
 const RE_RENDER_INTERVAL_MILLIS = 10;
 const API_CALL_INTERVAL_MILLIS = 2000;
+const DEFAULTS = {
+    BG_TYPE: "glass",
+    BG_COLOR: "000000ff",
+    TXT_COLOR: "dcdcde",
+    TXT_FONT: ""
+}
 
 async function getNowPlayingData(accessToken: string) {
     const headers = {
@@ -36,7 +42,7 @@ async function getNowPlayingData(accessToken: string) {
         return data;
     } catch (error) {
         console.error(error);
-        return {};
+        return new Promise((resolve) => resolve({}));
     }
 }
 
@@ -76,10 +82,32 @@ function getPlayerUpdate(player: Player) {
     }
 }
 
+function getStyles(queryParams: ReadonlyURLSearchParams) {
+    const bgType = queryParams.get("bg") || DEFAULTS.BG_TYPE;
+    const bgColor =  (bgType === "solid") ? 
+        (queryParams.get("bgcolor") || DEFAULTS.BG_COLOR) : 
+        DEFAULTS.BG_COLOR;
+    const textColor = queryParams.get("txtcolor") || DEFAULTS.TXT_COLOR;
+
+    return {
+        backgorund : {
+            type: bgType,
+            color: `#${bgColor}`
+        },
+        text: {
+            color: `#${textColor}` 
+        }
+    };
+}
+
 const NowPlaying = () => {
     const player = useRef(new Player);
     const [x, forceUpdate] = useReducer(x => x + 1, 0);
-    const accessToken = useSearchParams().get("access_token") ?? "";
+    const queryParams = useSearchParams();
+    const accessToken = queryParams.get("access_token") ?? "";
+    const width = queryParams.get("width") ?? "1800";
+    const scalingFactor = parseInt(width)/1800;
+    const styles = getStyles(queryParams);
 
     useEffect(() => {
         const divisor = Math.trunc(API_CALL_INTERVAL_MILLIS/RE_RENDER_INTERVAL_MILLIS);
@@ -100,14 +128,30 @@ const NowPlaying = () => {
     }
 
     return (
-        <div className="card card-side rounded-xl w-450 h-80 text-[#dadade] font-(family-name:--font-geist-sans)">
+        <div className={`card opacity-100 card-side rounded-xl text-[#dadade] font-(family-name:--font-geist-sans) ${styles.backgorund.type === "glass" ? "glass" : ""}`}
+            style = {(() => {
+                const fixedStyles = {
+                    width: "1800px",
+                    height: "320px",
+                    transform: `scale(${scalingFactor})`,
+                    transformOrigin: "top left",
+                    color: styles.text.color
+                }
+                if (styles.backgorund.type === "solid") {
+                    return {...fixedStyles, backgroundColor: styles.backgorund.color}
+                } else if (styles.backgorund.type === "transparent") {
+                    return  {...fixedStyles, backgroundColor: "transparent"};
+                }
+                return fixedStyles
+            })()}
+            >
             <figure className='p-5 pr-0 relative'>
                 {player.current.trackImageUri &&
                     <img className="rounded-xl max-w-80 max-h-80"
                         src={player.current.trackImageUri} 
                         alt=""/>
                 }
-                <PlayingAnimation/>
+                <PlayingAnimation color={styles.text.color}/>
             </figure>
             <div className="card-body m-auto ml-5">
                 <div className="pb-8">
@@ -122,9 +166,13 @@ const NowPlaying = () => {
                     <div className='text-4xl'>
                         {player.current.progress.mins}:{player.current.progress.secs}
                     </div>
-                    <progress className="progress my-auto mx-3 rounded-xl bg-[#4f5057] h-[14px]" 
+                    <progress className="progress my-auto mx-3 rounded-xl h-[14px]" 
                             value={player.current.progress.millis} 
-                            max={player.current.duration.millis}></progress>
+                            max={player.current.duration.millis}
+                            style={{
+                                color: styles.text.color,
+                                backgroundColor: `color-mix(in srgb, ${styles.text.color} 20%, transparent)`
+                            }}/>
                     <div className='text-4xl'>
                         {player.current.duration.mins}:{player.current.duration.secs}
                     </div>
