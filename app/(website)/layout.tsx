@@ -19,16 +19,16 @@ export default function WebsiteLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html data-theme="dark" lang="en">
+    <html data-theme="forest" lang="en">
       <body 
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}>      
         <div className="h-screen w-full">
-          <header className="h-[20%] p-5 flex bg-neutral">
+          <header className="h-[15%] p-5 flex bg-neutral">
             <div className="card card-side">
               <figure>
                 <Image
-                  width={90}
-                  height={90}
+                  width={70}
+                  height={70}
                   src="/spotify.png" 
                   alt=""/>
               </figure>
@@ -39,11 +39,11 @@ export default function WebsiteLayout({
                 Spotify Overlay for OBS
             </Link>
           </header>
-          <div className="h-[70%]">
+          <div className="h-[80%]">
             {children}
           </div>
-          <footer className="h-[10%] bg-neutral">
-            dsfafd
+          <footer className="h-[5%]">
+            
           </footer>
         </div>
       </body>

@@ -19,7 +19,7 @@ export default function NowPlayingLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html className="bg-transparent" lang="en">
+    <html data-theme="forest" lang="en">
         <body 
             className={`${geistSans.variable} ${geistMono.variable} bg-transparent antialiased`}>         
             <Suspense>

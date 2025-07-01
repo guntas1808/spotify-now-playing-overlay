@@ -4,8 +4,9 @@ import buildUrl from "build-url";
 import { useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
 import "./style.sass";
+import NowPlaying from "@/app/nowPlaying/page";
 
-function SuspenseContent() {
+export default function OverlayPage() {
   const queryParams = useSearchParams();
   const uri = buildUrl(`/nowPlaying`, {
     queryParams: {
@@ -13,17 +14,13 @@ function SuspenseContent() {
       width: "500",
     },
   });
-  
-  return <>
-    <div className="p-16 h-[70%]">
-          <iframe
-            id="now-playing-iframe"
-            scrolling="no"
-            width={1800}
-            height={500}
-            className="border border-neutral rounded-box m-auto p-5"
-            src={uri}
-          />
+
+  return (
+    <div className="flex flex-row h-full">
+      <div className="m-auto  w-[40%] overflow-clip h-full">
+        <div className="p-16 h-[70%]">
+        <div className="mb-3 text-xl">Preview:</div>
+        <NowPlaying width="700"></NowPlaying>
         </div>
         <div className="flex-col m-auto p-16 pt-0">
           <div className="mb-3 text-xl">Link:</div>
@@ -31,26 +28,6 @@ function SuspenseContent() {
             {`${window.location.origin}${uri}`}
           </div>
         </div>
-  </>
-}
-
-export default function OverlayPage() {
-  
-
-  useEffect(() => {
-    const iframe = document.getElementById("now-playing-iframe");
-    if (iframe) {
-      iframe.style.width = "100%";
-      iframe.style.height = "100%";
-    }
-  });
-
-  return (
-    <div className="flex flex-row h-full">
-      <div className="m-auto  w-[40%] overflow-clip h-full">
-        <Suspense>
-          <SuspenseContent />
-        </Suspense>
       </div>
       <div className="w-[60%] h-full flex">
         <div className="h-[70%] m-auto w-[80%]">

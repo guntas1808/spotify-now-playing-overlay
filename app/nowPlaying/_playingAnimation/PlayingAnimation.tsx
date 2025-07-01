@@ -13,10 +13,10 @@ const PlayingAnimation = (props: Props) => {
                   absolute flex flex-row
                   opacity-80
                   right-4 bottom-9
-                  w-auto h-[65]
+                  w-auto h-[65px]
                   bg-[#4f5057]
                   rounded-xl
-                  p-[7.5]"
+                  p-[7.5px]"
         id="music"
         style={{
           backgroundColor: `color-mix(in srgb, ${baseColorHex} 20%, transparent)`,

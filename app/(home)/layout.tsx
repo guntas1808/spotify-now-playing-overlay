@@ -18,7 +18,7 @@ export default function NowPlayingLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html data-theme="dark" lang="en">
+    <html data-theme="forest" lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <div className="h-screen w-screen flex flex-col">
             {children}

@@ -5,6 +5,9 @@ import { useEffect, useReducer, useRef } from "react";
 import SpotifyApiResponseJson from "./schema";
 import PlayingAnimation from "./_playingAnimation/PlayingAnimation";
 
+declare type NowPlayingProps = {
+    width: string
+}
 class TimeStamp {
     millis: number = -1;
     secs: string = "";
@@ -100,12 +103,12 @@ function getStyles(queryParams: ReadonlyURLSearchParams) {
     };
 }
 
-const NowPlaying = () => {
+const NowPlaying = (props: NowPlayingProps) => {
     const player = useRef(new Player);
     const [x, forceUpdate] = useReducer(x => x + 1, 0);
     const queryParams = useSearchParams();
     const accessToken = queryParams.get("access_token") ?? "";
-    const width = queryParams.get("width") ?? "1800";
+    const width = props.width ?? queryParams.get("width") ?? "1800";
     const scalingFactor = parseInt(width)/1800;
     const styles = getStyles(queryParams);
 
