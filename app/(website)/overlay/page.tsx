@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
 import buildUrl from "build-url";
 import { useSearchParams } from "next/navigation";
-import React, { Suspense, useEffect } from "react";
 import "./style.sass";
-import NowPlaying from "@/app/nowPlaying/page";
+import PlayerCard from "@/app/nowPlaying/_playerCard/PlayerCard";
+import { Suspense } from "react";
 
-export default function OverlayPage() {
+function LinkTextBox() {
   const queryParams = useSearchParams();
   const uri = buildUrl(`/nowPlaying`, {
     queryParams: {
@@ -15,18 +15,27 @@ export default function OverlayPage() {
     },
   });
 
+  return <>
+    <div className="mb-3 text-xl">Link:</div>
+    <div className="rounded-box border border-neutral overflow- break-words text-wrap p-3 h-28 mx-auto">
+      {`${window.location.origin}${uri}`}
+    </div>
+  </>
+}
+
+export default function OverlayPage() {
+  
   return (
     <div className="flex flex-row h-full">
       <div className="m-auto  w-[40%] overflow-clip h-full">
-        <div className="p-16 h-[70%]">
+        <div className="p-16 h-npo[70%]">
         <div className="mb-3 text-xl">Preview:</div>
-        <NowPlaying width="700"></NowPlaying>
+        <PlayerCard width="700"/>
         </div>
         <div className="flex-col m-auto p-16 pt-0">
-          <div className="mb-3 text-xl">Link:</div>
-          <div className="rounded-box border border-neutral overflow- break-words text-wrap p-3 h-28 mx-auto">
-            {`${window.location.origin}${uri}`}
-          </div>
+          <Suspense>
+            <LinkTextBox/>
+          </Suspense>
         </div>
       </div>
       <div className="w-[60%] h-full flex">
