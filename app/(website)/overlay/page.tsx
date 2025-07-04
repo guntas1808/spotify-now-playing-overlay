@@ -30,7 +30,9 @@ export default function OverlayPage() {
       <div className="m-auto  w-[40%] overflow-clip h-full">
         <div className="p-16 h-npo[70%]">
         <div className="mb-3 text-xl">Preview:</div>
-        <PlayerCard width="700"/>
+          <Suspense>
+            <PlayerCard width="700"/>
+          </Suspense>
         </div>
         <div className="flex-col m-auto p-16 pt-0">
           <Suspense>
