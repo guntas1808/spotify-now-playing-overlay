@@ -17,7 +17,7 @@ function LinkTextBox() {
 
   return <>
     <div className="mb-3 text-xl">Link:</div>
-    <div className="rounded-box border border-neutral overflow- break-words text-wrap p-3 h-28 mx-auto">
+    <div className="rounded-box border border-neutral p-3 h-28">
       {`${window.location.origin}${uri}`}
     </div>
   </>
@@ -25,16 +25,18 @@ function LinkTextBox() {
 
 export default function OverlayPage() {
   
+
+  
   return (
     <div className="flex flex-row h-full">
-      <div className="m-auto  w-[40%] overflow-clip h-full">
-        <div className="p-16 h-npo[70%]">
-        <div className="mb-3 text-xl">Preview:</div>
-          <Suspense>
-            <PlayerCard width="700"/>
-          </Suspense>
-        </div>
-        <div className="flex-col m-auto p-16 pt-0">
+      <div className="flex flex-col m-auto  w-[40%] overflow-clip h-full">
+          <div className="flex flex-col h-[50%] justify-center m-auto">
+            <div className="mb-3 text-xl">Preview:</div>
+            <Suspense>
+              <PlayerCard width="700"/>
+            </Suspense>
+          </div>
+        <div className="flex flex-col h-[50%] justify-center m-auto pt-0">
           <Suspense>
             <LinkTextBox/>
           </Suspense>

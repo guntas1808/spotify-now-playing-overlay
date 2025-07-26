@@ -131,53 +131,58 @@ const PlayerCard = (props: Props) => {
         );
     }
     return <>
-        <div className={`card opacity-100 card-side rounded-xl text-[#dadade] font-(family-name:--font-geist-sans) ${styles.backgorund.type === "glass" ? "glass" : ""}`}
-            style = {(() => {
-                const fixedStyles = {
-                    width: "1800px",
-                    height: "320px",
-                    transform: `scale(${scalingFactor})`,
-                    transformOrigin: "top left",
-                    color: styles.text.color
-                }
-                if (styles.backgorund.type === "solid") {
-                    return {...fixedStyles, backgroundColor: styles.backgorund.color}
-                } else if (styles.backgorund.type === "transparent") {
-                    return  {...fixedStyles, backgroundColor: "transparent"};
-                }
-                return fixedStyles
-            })()}
-            >
-            <figure className='p-5 pr-0 relative'>
-                {player.current.trackImageUri &&
-                    <img className="rounded-xl max-w-80 max-h-80"
-                        src={player.current.trackImageUri} 
-                        alt=""/>
-                }
-                <PlayingAnimation color={styles.text.color}/>
-            </figure>
-            <div className="card-body m-auto ml-5">
-                <div className="pb-8">
-                    <div className="text-7xl tracking-normal pb-4">
-                        {player.current.trackName.trim()}
+        <div style={{
+            width: `${1800*scalingFactor}px`,
+            height: `${320*scalingFactor}px`,
+        }}>
+            <div className={`card opacity-100 card-side rounded-xl text-[#dadade] font-(family-name:--font-geist-sans) ${styles.backgorund.type === "glass" ? "glass" : ""}`}
+                style = {(() => {
+                    const fixedStyles = {
+                        width: "1800px",
+                        height: "320px",
+                        transform: `scale(${scalingFactor})`,
+                        transformOrigin: "top left",
+                        color: styles.text.color
+                    }
+                    if (styles.backgorund.type === "solid") {
+                        return {...fixedStyles, backgroundColor: styles.backgorund.color}
+                    } else if (styles.backgorund.type === "transparent") {
+                        return  {...fixedStyles, backgroundColor: "transparent"};
+                    }
+                    return fixedStyles
+                })()}
+                >
+                <figure className='p-5 pr-0 relative'>
+                    {player.current.trackImageUri &&
+                        <img className="rounded-xl max-w-80 max-h-80"
+                            src={player.current.trackImageUri} 
+                            alt=""/>
+                    }
+                    <PlayingAnimation color={styles.text.color}/>
+                </figure>
+                <div className="card-body m-auto ml-5">
+                    <div className="pb-8">
+                        <div className="text-7xl tracking-normal pb-4">
+                            {player.current.trackName.trim()}
+                        </div>
+                        <span className='text-5xl'>
+                            {player.current.artistNames.join(', ')}
+                        </span>
                     </div>
-                    <span className='text-5xl'>
-                        {player.current.artistNames.join(', ')}
-                    </span>
-                </div>
-                <div className="progress-bar flex">
-                    <div className='text-4xl'>
-                        {player.current.progress.mins}:{player.current.progress.secs}
-                    </div>
-                    <progress className="progress my-auto mx-3 rounded-xl h-[14px]" 
-                            value={player.current.progress.millis} 
-                            max={player.current.duration.millis}
-                            style={{
-                                color: styles.text.color,
-                                backgroundColor: `color-mix(in srgb, ${styles.text.color} 20%, transparent)`
-                            }}/>
-                    <div className='text-4xl'>
-                        {player.current.duration.mins}:{player.current.duration.secs}
+                    <div className="progress-bar flex">
+                        <div className='text-4xl'>
+                            {player.current.progress.mins}:{player.current.progress.secs}
+                        </div>
+                        <progress className="progress my-auto mx-3 rounded-xl h-[14px]" 
+                                value={player.current.progress.millis} 
+                                max={player.current.duration.millis}
+                                style={{
+                                    color: styles.text.color,
+                                    backgroundColor: `color-mix(in srgb, ${styles.text.color} 20%, transparent)`
+                                }}/>
+                        <div className='text-4xl'>
+                            {player.current.duration.mins}:{player.current.duration.secs}
+                        </div>
                     </div>
                 </div>
             </div>
