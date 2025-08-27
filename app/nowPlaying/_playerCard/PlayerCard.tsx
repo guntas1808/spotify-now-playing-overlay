@@ -38,10 +38,16 @@ const DEFAULTS = {
     BG_COLOR: "#000000ff",
     TXT_COLOR: "#dcdcde",
     TXT_FONT: "",
-    OPACITY: "1"
+    OPACITY: "100"
 }
+const COOKIE_NAME = 'spotify-access-token';
 
-async function getNowPlayingData(accessToken: string) {
+
+async function getNowPlayingData() {
+    const queryParams = new URLSearchParams(location.search);
+    const accessTokenFromCookie = (await window.cookieStore.get(COOKIE_NAME))?.value;
+    const accessToken = accessTokenFromCookie ?? queryParams.get("access_token") ?? "";
+    
     const headers = {
         'Authorization': `Bearer ${accessToken}`
     }
@@ -92,7 +98,7 @@ function getPlayerUpdate(player: Player) {
 }
 
 function getHexWithOpacity(color: string, opacity: number) {
-    return color + (opacity*255).toString(16);
+    return color + ((opacity*255)/100).toString(16);
 }
 
 function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
@@ -101,7 +107,7 @@ function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
         (props.bgColor ?? queryParams.get("bgcolor") ?? DEFAULTS.BG_COLOR) : 
         DEFAULTS.BG_COLOR;
     const textColor = props.txtColor ?? queryParams.get("txtcolor") ?? DEFAULTS.TXT_COLOR;
-    const opacity = props.opacity ?? parseFloat(queryParams.get("opacity") ?? DEFAULTS.OPACITY);
+    const opacity = props.opacity ?? parseInt(queryParams.get("opacity") ?? DEFAULTS.OPACITY);
 
     return {
         backgorund : {
@@ -118,7 +124,6 @@ const PlayerCard = (props: Props) => {
     const player = useRef(new Player);
     const [x, forceUpdate] = useReducer(x => x + 1, 0);
     const queryParams = useSearchParams();
-    const accessToken = queryParams.get("access_token") ?? "";
     const width = props.width ?? queryParams.get("width") ?? "1800";
     const scalingFactor = parseInt(width)/1800;
     const styles = getStyles(props, queryParams);
@@ -126,7 +131,7 @@ const PlayerCard = (props: Props) => {
     useEffect(() => {
         const divisor = Math.trunc(API_CALL_INTERVAL_MILLIS/RE_RENDER_INTERVAL_MILLIS);
         if (x%divisor === 0) {
-            const dataPromise = getNowPlayingData(accessToken); 
+            const dataPromise = getNowPlayingData(); 
             dataPromise.then((data) => player.current = constructPlayer(data));
             return;
         } else if (player.current.isPlaying) {
