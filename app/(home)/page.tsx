@@ -5,7 +5,7 @@ import Image from "next/image";
 async function getSpotifyLoginUri(): Promise<string> {
   const headerList = await headers();
   const origin = headerList.get("x-location-origin");
-  const redirectUri: string = `${origin}/redirect`
+  const redirectUri: string = `${origin}/overlay`
   const queryParams = {
     client_id: "e260bec14eb448219fd414c6d880cd8d",
     redirect_uri: redirectUri,
@@ -23,7 +23,7 @@ export default async function Home() {
   return (
     <>
       <div className="flex-row flex m-auto">
-        <figure className="p-2">
+        <figure className="logo p-2 animate__fadeInUp animate__animated">
           <Image src="/spotify.png" 
                   alt="Spotify Logo" 
                   width={100} 
@@ -31,7 +31,7 @@ export default async function Home() {
                   className="m-auto"/>
         </figure>
         <a href={loginUri}
-          className="btn btn-soft btn-xl btn-success text-4xl p-12 rounded-full ml-2 m-auto">
+          className="login-btn btn btn-soft btn-xl btn-success text-4xl p-12 rounded-full ml-2 m-auto animate__fadeInUp animate__animated animate__fast">
           Login to Spotify
         </a>
       </div>
