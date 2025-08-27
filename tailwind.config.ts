@@ -10,12 +10,13 @@ const config: Config = {
   theme: {
     extend: {},
   },
-  plugins: [daisyui],
-  daisyui: {
-    themes: ["forest --prefersdark"],
-    defaultTheme: "forest",
-    logs: false,
-  },
+  plugins: [
+    daisyui({
+      themes: ["forest"],
+      defaultTheme: "forest",
+      logs: false,
+    })
+  ]
 }
 
 export default config;
