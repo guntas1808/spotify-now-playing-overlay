@@ -7,7 +7,11 @@ import SpotifyApiResponseJson from "../schema";
 
 
 type Props = {
-    width?: string
+    width?: string,
+    bgType?: string,
+    bgColor?: string,
+    txtColor?: string,
+    opacity?: number
 }
 class TimeStamp {
     millis: number = -1;
@@ -31,9 +35,10 @@ const RE_RENDER_INTERVAL_MILLIS = 10;
 const API_CALL_INTERVAL_MILLIS = 2000;
 const DEFAULTS = {
     BG_TYPE: "glass",
-    BG_COLOR: "000000ff",
-    TXT_COLOR: "dcdcde",
-    TXT_FONT: ""
+    BG_COLOR: "#000000ff",
+    TXT_COLOR: "#dcdcde",
+    TXT_FONT: "",
+    OPACITY: "1"
 }
 
 async function getNowPlayingData(accessToken: string) {
@@ -86,20 +91,25 @@ function getPlayerUpdate(player: Player) {
     }
 }
 
-function getStyles(queryParams: ReadonlyURLSearchParams) {
-    const bgType = queryParams.get("bg") || DEFAULTS.BG_TYPE;
+function getHexWithOpacity(color: string, opacity: number) {
+    return color + (opacity*255).toString(16);
+}
+
+function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
+    const bgType = props.bgType ?? queryParams.get("bg") ?? DEFAULTS.BG_TYPE;
     const bgColor =  (bgType === "solid") ? 
-        (queryParams.get("bgcolor") || DEFAULTS.BG_COLOR) : 
+        (props.bgColor ?? queryParams.get("bgcolor") ?? DEFAULTS.BG_COLOR) : 
         DEFAULTS.BG_COLOR;
-    const textColor = queryParams.get("txtcolor") || DEFAULTS.TXT_COLOR;
+    const textColor = props.txtColor ?? queryParams.get("txtcolor") ?? DEFAULTS.TXT_COLOR;
+    const opacity = props.opacity ?? parseFloat(queryParams.get("opacity") ?? DEFAULTS.OPACITY);
 
     return {
         backgorund : {
             type: bgType,
-            color: `#${bgColor}`
+            color: getHexWithOpacity(bgColor, opacity)
         },
         text: {
-            color: `#${textColor}` 
+            color: textColor 
         }
     };
 }
@@ -111,7 +121,7 @@ const PlayerCard = (props: Props) => {
     const accessToken = queryParams.get("access_token") ?? "";
     const width = props.width ?? queryParams.get("width") ?? "1800";
     const scalingFactor = parseInt(width)/1800;
-    const styles = getStyles(queryParams);
+    const styles = getStyles(props, queryParams);
 
     useEffect(() => {
         const divisor = Math.trunc(API_CALL_INTERVAL_MILLIS/RE_RENDER_INTERVAL_MILLIS);

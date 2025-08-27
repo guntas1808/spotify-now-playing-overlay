@@ -1,13 +1,19 @@
 label
-    & > span
-        width: 40%
+    
+    &.select, &.input
+        // background-color: var(--color-primary)
+        // color: var(--color-primary-content)
+        width: 60%
 
-    &.select > select
-        width: 70%
+        & > select, & > input
+            width: 60%
+
+        & > span
+            width: 40%
+            // color: var(--color-primary-content)
     
     & > input[type=color]
         appearance: none
-        width: 60% 
         height: 30px
         margin: auto
         background-color: transparent

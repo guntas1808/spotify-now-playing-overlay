@@ -23,7 +23,7 @@ export default function WebsiteLayout({
       <body 
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}>      
         <div className="h-screen w-full">
-          <header className="h-[15%] p-5 flex bg-neutral">
+          <header className="h-[15%] p-5 flex bg-neutral text-neutral-content">
             <div className="card card-side">
               <figure>
                 <Image
