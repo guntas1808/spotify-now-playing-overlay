@@ -5,7 +5,7 @@ import Image from "next/image";
 async function getSpotifyLoginUri(): Promise<string> {
   const headerList = await headers();
   const origin = headerList.get("x-location-origin");
-  const redirectUri: string = `${origin}/overlay`
+  const redirectUri: string = `${origin}/redirect`
   const queryParams = {
     client_id: "e260bec14eb448219fd414c6d880cd8d",
     redirect_uri: redirectUri,

@@ -7,26 +7,12 @@ import { ChangeEvent, Suspense, useEffect, useState } from "react";
 
 const COOKIE_NAME = 'spotify-access-token';
 
-async function checkAndUpdateAccessTokenCookie() {
+async function getAccessTokenCookie() {
   const cookie = await window.cookieStore.get(COOKIE_NAME);
   if(cookie) {
-    return;
+    return cookie;
   }
-
-  const urlHash = new URLSearchParams(location.hash.substring(1));
-  const validityDurationInSecs = parseInt(urlHash.get('expires_in') ?? '0') ;
-  const expirationTimestamp = Date.now() + validityDurationInSecs*100;
-  const accessToken = urlHash.get('access_token');
-
-  if (accessToken) {
-    window.cookieStore.set({
-      name: COOKIE_NAME,
-      value: accessToken,
-      expires: expirationTimestamp
-    });
-  } else {
-    // location.replace(location.origin);
-  }
+  location.replace(location.origin);
 }
 
 export default function OverlayPage() {
@@ -38,9 +24,8 @@ export default function OverlayPage() {
   const [url, setUrl] = useState<string>();
 
   useEffect(() => {
-    checkAndUpdateAccessTokenCookie();
     const updateLinkTextBox = async (bgType: string, bgColor: string, txtColor: string, opacity: number, width: number) => {
-      const cookie = await window.cookieStore.get(COOKIE_NAME);
+      const cookie = await getAccessTokenCookie();
       if (!cookie) {
         return;
       }
@@ -65,7 +50,7 @@ export default function OverlayPage() {
 
   return (
     <div className="flex flex-row h-full">
-      <div className="flex flex-col m-auto  w-[40%] overflow-clip h-full">
+      <div className="flex flex-col m-auto  w-[45%] overflow-clip h-full">
           <div className="flex flex-col h-[50%] justify-center m-auto">
             <div className="mb-3 text-xl">Preview:</div>
             <Suspense>
@@ -75,14 +60,14 @@ export default function OverlayPage() {
         <div className="flex flex-col h-[50%] justify-center m-auto pt-0">
             <div className="mb-3 text-xl">Link:</div>
             {url && url !== "" ?
-              <div className="rounded-box border border-neutral p-3 w-[700px] overflow-hidden">
+              <div className="animate__animated animate__fadeIn bg-base-300 rounded-box p-3 w-[700px] text-balance break-words overflow-hidden">
                 {url}
               </div> :
               <div className="skeleton h-28 w-[700px]"/>
             }
         </div>
       </div>
-      <div className="w-[60%] h-full flex">
+      <div className="w-[55%] h-full flex">
         <div className="h-[70%] m-auto w-[80%]">
           <h1 className="m-auto text-center text-3xl">Customize</h1>
           <div className="flex flex-col mt-5 gap-y-3 border-gray-700">
