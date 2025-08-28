@@ -102,11 +102,11 @@ function getHexWithOpacity(color: string, opacity: number) {
 }
 
 function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
-    const bgType = props.bgType ?? queryParams.get("bg") ?? DEFAULTS.BG_TYPE;
+    const bgType = props.bgType || queryParams.get("bg") || DEFAULTS.BG_TYPE;
     const bgColor =  (bgType === "solid") ? 
-        (props.bgColor ?? queryParams.get("bgcolor") ?? DEFAULTS.BG_COLOR) : 
+        (props.bgColor || queryParams.get("bgcolor") || DEFAULTS.BG_COLOR) : 
         DEFAULTS.BG_COLOR;
-    const textColor = props.txtColor ?? queryParams.get("txtcolor") ?? DEFAULTS.TXT_COLOR;
+    const textColor = props.txtColor || queryParams.get("txtcolor") || DEFAULTS.TXT_COLOR;
     const opacity = props.opacity ?? parseInt(queryParams.get("opacity") ?? DEFAULTS.OPACITY);
 
     return {
@@ -140,11 +140,18 @@ const PlayerCard = (props: Props) => {
     }, [x])
     setTimeout(forceUpdate, RE_RENDER_INTERVAL_MILLIS)
     
-    if (Object.entries(player.current).length === 0) {
+    if (Object.entries(player.current).length === 0 || !player.current.isPlaying) {
         return (
-            <></>
+            <div className="skeleton" 
+                style={{
+                    width: `${1800*scalingFactor}px`,
+                    height: `${320*scalingFactor}px`,
+                }}>
+            </div>
         );
     }
+
+    console.log(JSON.stringify(player));
     return <>
         <div style={{
             width: `${1800*scalingFactor}px`,

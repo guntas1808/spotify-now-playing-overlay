@@ -2,6 +2,7 @@
 
 import "./style.sass";
 import PlayerCard from "@/app/nowPlaying/_playerCard/PlayerCard";
+import BuildUrl from "build-url";
 import { ChangeEvent, Suspense, useEffect, useState } from "react";
 
 const COOKIE_NAME = 'spotify-access-token';
@@ -24,19 +25,42 @@ async function checkAndUpdateAccessTokenCookie() {
       expires: expirationTimestamp
     });
   } else {
-    location.replace(location.origin);
+    // location.replace(location.origin);
   }
 }
 
 export default function OverlayPage() {
-  const [bgType, setBgType] = useState<string>("glass");
+  const [bgType, setBgType] = useState<string>("");
   const [bgColor, setBgColor] = useState<string>("");
   const [txtColor, setTxtColor] = useState<string>("");
   const [opacity, setOpacity] = useState<number>(100);
   const [width, setWidth] = useState<number>(1500);
+  const [url, setUrl] = useState<string>();
 
   useEffect(() => {
     checkAndUpdateAccessTokenCookie();
+    const updateLinkTextBox = async (bgType: string, bgColor: string, txtColor: string, opacity: number, width: number) => {
+      const cookie = await window.cookieStore.get(COOKIE_NAME);
+      if (!cookie) {
+        return;
+      }
+
+      const token = cookie.value ?? '';
+      const urlString = BuildUrl(location.origin, {
+        path: 'nowPlaying',
+        queryParams: {
+          bg: bgType,
+          bgcolor: bgColor,
+          txtcolor: txtColor,
+          opacity: opacity.toString(),
+          width: width.toString(),
+          access_token: token
+        }
+      });
+      setUrl(urlString);
+    };
+
+    updateLinkTextBox(bgType, bgColor, txtColor, opacity, width);
   })
 
   return (
@@ -50,9 +74,12 @@ export default function OverlayPage() {
           </div>
         <div className="flex flex-col h-[50%] justify-center m-auto pt-0">
             <div className="mb-3 text-xl">Link:</div>
-            <div className="rounded-box border border-neutral p-3 h-28 w-[700px]">
-              {`/nowPlaying?${bgType ? `type=${bgType}&` : ""}${bgColor ? `bgcolor=${bgColor}&` : ""}${txtColor ? `txtcolor=${txtColor}&` : ""}${opacity ? `opacity=${opacity}&` : ""}${width ? `width=${width}&` : ""}`}
-            </div>
+            {url && url !== "" ?
+              <div className="rounded-box border border-neutral p-3 w-[700px] overflow-hidden">
+                {url}
+              </div> :
+              <div className="skeleton h-28 w-[700px]"/>
+            }
         </div>
       </div>
       <div className="w-[60%] h-full flex">
@@ -62,7 +89,7 @@ export default function OverlayPage() {
             <label className="select border-inherit m-auto  w-[400px]">
               <span className="label">Background: </span>
               <select className="select-success" 
-                      defaultValue={bgType} 
+                      defaultValue={bgType || 'glass'} 
                       onChange={(event: ChangeEvent<HTMLSelectElement>) => setBgType(event.target.value)}>
                 <option value="transparent">Transparent</option>
                 <option value="glass">Glass</option>
