@@ -1,15 +1,12 @@
 'use client';
 
-import buildUrl from "build-url";
-import { useSearchParams } from "next/navigation";
 import "./style.sass";
 import PlayerCard from "@/app/nowPlaying/_playerCard/PlayerCard";
-import { ChangeEvent, Dispatch, SetStateAction, Suspense, useEffect, useState } from "react";
-import { url } from "inspector";
+import { ChangeEvent, Suspense, useEffect, useState } from "react";
 
 const COOKIE_NAME = 'spotify-access-token';
 
-async function checkAndUpdateAccessTokenCookie(setAccessToken: Dispatch<SetStateAction<string>>) {
+async function checkAndUpdateAccessTokenCookie() {
   const cookie = await window.cookieStore.get(COOKIE_NAME);
   if(cookie) {
     return;
@@ -37,10 +34,9 @@ export default function OverlayPage() {
   const [txtColor, setTxtColor] = useState<string>("");
   const [opacity, setOpacity] = useState<number>(100);
   const [width, setWidth] = useState<number>(1500);
-  const [accessToken, setAcessToken] = useState<string>("");
 
   useEffect(() => {
-    checkAndUpdateAccessTokenCookie(setAcessToken);
+    checkAndUpdateAccessTokenCookie();
   })
 
   return (
@@ -55,7 +51,7 @@ export default function OverlayPage() {
         <div className="flex flex-col h-[50%] justify-center m-auto pt-0">
             <div className="mb-3 text-xl">Link:</div>
             <div className="rounded-box border border-neutral p-3 h-28 w-[700px]">
-              {`${window.location.origin}/nowPlaying?${bgType ? `type=${bgType}&` : ""}${bgColor ? `bgcolor=${bgColor}&` : ""}${txtColor ? `txtcolor=${txtColor}&` : ""}${opacity ? `opacity=${opacity}&` : ""}${width ? `width=${width}&` : ""}`}
+              {`/nowPlaying?${bgType ? `type=${bgType}&` : ""}${bgColor ? `bgcolor=${bgColor}&` : ""}${txtColor ? `txtcolor=${txtColor}&` : ""}${opacity ? `opacity=${opacity}&` : ""}${width ? `width=${width}&` : ""}`}
             </div>
         </div>
       </div>
