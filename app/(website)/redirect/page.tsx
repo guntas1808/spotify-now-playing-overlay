@@ -9,7 +9,7 @@ const Redirect = () => {
     const urlHash = new URLSearchParams(window.location.hash.substring(1));
     const accessToken = urlHash.get("access_token");
     const validityDurationInSecs = parseInt(urlHash.get('expires_in') ?? '0') ;
-    const expirationTimestamp = Date.now() + validityDurationInSecs*100;
+    const expirationTimestamp = Date.now() + validityDurationInSecs*1000;
     
     if (accessToken) {
         window.cookieStore.set({
