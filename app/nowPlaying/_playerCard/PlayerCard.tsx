@@ -32,7 +32,7 @@ class Player {
 }
 const spotiyNowPlayingEndpoint = "https://api.spotify.com/v1/me/player/currently-playing";
 const RE_RENDER_INTERVAL_MILLIS = 10;
-const API_CALL_INTERVAL_MILLIS = 2000;
+const API_CALL_INTERVAL_MILLIS = 3000;
 const DEFAULTS = {
     BG_TYPE: "glass",
     BG_COLOR: "#000000ff",
@@ -41,7 +41,7 @@ const DEFAULTS = {
     OPACITY: "100"
 }
 const COOKIE_NAME = 'spotify-access-token';
-
+const PLAYER_CONTAINER_ID = 'player-conatiner';
 
 async function getNowPlayingData() {
     const queryParams = new URLSearchParams(location.search);
@@ -122,7 +122,7 @@ function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
 
 const PlayerCard = (props: Props) => {
     const player = useRef(new Player);
-    const [x, forceUpdate] = useReducer(x => x + 1, 0);
+    const [t, dispatch] = useReducer(t => t + 1, 0);
     const queryParams = useSearchParams();
     const width = props.width ?? queryParams.get("width") ?? "1800";
     const scalingFactor = parseInt(width)/1800;
@@ -130,17 +130,29 @@ const PlayerCard = (props: Props) => {
 
     useEffect(() => {
         const divisor = Math.trunc(API_CALL_INTERVAL_MILLIS/RE_RENDER_INTERVAL_MILLIS);
-        if (x%divisor === 0) {
+        if (t%divisor === 0) {
             const dataPromise = getNowPlayingData(); 
-            dataPromise.then((data) => player.current = constructPlayer(data));
+            dataPromise.then((data) => {
+                const newPlayer = constructPlayer(data);
+                console.log(`${newPlayer}`)
+                if (!newPlayer.isPlaying && player.current.isPlaying) {
+                    const playerContainer = document.getElementById(PLAYER_CONTAINER_ID);
+                    playerContainer?.classList.remove('animate__fadeIn');
+                    playerContainer?.classList.add('animate__fadeOut');
+                    setTimeout(() => player.current = newPlayer, 400);
+                } else if (newPlayer.isPlaying || player.current.isPlaying) {
+                    player.current = newPlayer
+                }
+            });
             return;
         } else if (player.current.isPlaying) {
             player.current = getPlayerUpdate(player.current);
         }
-    }, [x])
-    setTimeout(forceUpdate, RE_RENDER_INTERVAL_MILLIS)
+    }, [t])
+    setTimeout(dispatch, RE_RENDER_INTERVAL_MILLIS)
     
     if (Object.entries(player.current).length === 0 || !player.current.isPlaying) {
+        
         return (
             <div className="skeleton" 
                 style={{
@@ -153,9 +165,10 @@ const PlayerCard = (props: Props) => {
 
     console.log(JSON.stringify(player));
     return <>
-        <div style={{
-            width: `${1800*scalingFactor}px`,
-            height: `${320*scalingFactor}px`,
+        <div id={PLAYER_CONTAINER_ID} className="animate__animated animate__fadeIn"
+            style={{
+                width: `${1800*scalingFactor}px`,
+                height: `${320*scalingFactor}px`,
         }}>
             <div className={`card opacity-100 card-side rounded-xl text-[#dadade] font-(family-name:--font-geist-sans) ${styles.backgorund.type === "glass" ? "glass" : ""}`}
                 style = {(() => {

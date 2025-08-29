@@ -23,7 +23,7 @@ export default async function Home() {
   return (
     <>
       <div className="flex-row flex m-auto">
-        <figure className="logo p-2 animate__fadeInUp animate__animated">
+        <figure className="logo p-2 animate__fadeIn animate__animated">
           <Image src="/spotify.png" 
                   alt="Spotify Logo" 
                   width={100} 
@@ -31,8 +31,8 @@ export default async function Home() {
                   className="m-auto"/>
         </figure>
         <a href={loginUri}
-          className="login-btn btn btn-soft btn-xl btn-success text-4xl p-12 rounded-full ml-2 m-auto animate__fadeInUp animate__animated animate__fast">
-          Login to Spotify
+          className="login-btn btn btn-soft btn-xl btn-success text-4xl p-12 rounded-full ml-2 m-auto animate__fadeIn animate__animated animate__fast">
+          Login with Spotify
         </a>
       </div>
     </>
