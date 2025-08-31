@@ -5,7 +5,6 @@ import { useEffect, useReducer, useRef } from "react";
 import PlayingAnimation from "../_playingAnimation/PlayingAnimation";
 import SpotifyApiResponseJson from "../schema";
 
-
 type Props = {
     width?: string,
     bgType?: string,
@@ -123,6 +122,7 @@ function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
 const PlayerCard = (props: Props) => {
     const player = useRef(new Player);
     const [t, dispatch] = useReducer(t => t + 1, 0);
+
     const queryParams = useSearchParams();
     const width = props.width ?? queryParams.get("width") ?? "1800";
     const scalingFactor = parseInt(width)/1800;
@@ -134,7 +134,6 @@ const PlayerCard = (props: Props) => {
             const dataPromise = getNowPlayingData(); 
             dataPromise.then((data) => {
                 const newPlayer = constructPlayer(data);
-                console.log(`${newPlayer}`)
                 if (!newPlayer.isPlaying && player.current.isPlaying) {
                     const playerContainer = document.getElementById(PLAYER_CONTAINER_ID);
                     playerContainer?.classList.remove('animate__fadeIn');
@@ -151,8 +150,7 @@ const PlayerCard = (props: Props) => {
     }, [t])
     setTimeout(dispatch, RE_RENDER_INTERVAL_MILLIS)
     
-    if (Object.entries(player.current).length === 0 || !player.current.isPlaying) {
-        
+    if (Object.entries(player.current).length === 0 || !player.current.isPlaying) { 
         return (
             <div className="skeleton" 
                 style={{
@@ -163,7 +161,6 @@ const PlayerCard = (props: Props) => {
         );
     }
 
-    console.log(JSON.stringify(player));
     return <>
         <div id={PLAYER_CONTAINER_ID} className="animate__animated animate__fadeIn"
             style={{
@@ -189,7 +186,7 @@ const PlayerCard = (props: Props) => {
                 >
                 <figure className='p-5 pr-0 relative'>
                     {player.current.trackImageUri &&
-                        <img className="rounded-xl max-w-80 max-h-80"
+                        <img id="player-card-image" className="rounded-xl max-w-80 max-h-80"
                             src={player.current.trackImageUri} 
                             alt=""/>
                     }
