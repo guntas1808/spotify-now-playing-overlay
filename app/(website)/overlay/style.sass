@@ -34,6 +34,18 @@ label
 fieldset fieldset label.input
     width: 100%
 
+div.customization-form-container
+    @for $i from 1 through 3
+        &:nth-child(#{$i})
+            animation-delay: #{0.5 * ($i)}s
+
+label > span.floating-label
+    position: relative
+    top: 1rem
+    left: 1rem
+    font-weight: 600
+    z-index: 1
+    
 .tabs 
     align-items: center
     justify-content: center

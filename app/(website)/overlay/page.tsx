@@ -18,19 +18,25 @@ export default function OverlayPage() {
     <div className="flex flex-row h-full">
       <div className="flex flex-col m-auto  w-[45%] overflow-clip h-full">
         <div className="flex flex-col h-[50%] justify-center m-auto">
-          <div className="mb-3 text-xl">Preview:</div>
-          <Suspense>
-            <PlayerCard width="700" bgType={bgType} bgColor={bgColor} txtColor={txtColor} opacity={opacity} />
-          </Suspense>
+          <label htmlFor="">
+            <span className="floating-label text-lg">
+              Overlay Preview
+            </span>
+            <div className="bg-base-200 p-5 pt-10 m-auto w-[800px] rounded-box h-[300px]">
+              <Suspense>
+                <PlayerCard width="700" bgType={bgType} bgColor={bgColor} txtColor={txtColor} opacity={opacity} />
+              </Suspense>
+            </div>
+          </label>
         </div>
-        <div className="flex flex-col h-[50%] justify-center m-auto pt-0">
+        <div className="flex flex-col h-[50%] m-auto pt-0">
             <LinkTextBox bgType={bgType} bgColor={bgColor} txtColor={txtColor} opacity={opacity} width={width} />
         </div>
       </div>
-      <div className="w-[55%] h-full flex">
-        <div className="h-[70%] m-auto w-[80%]">
+      <div className="w-[55%] h-full flex overflow-clip">
+        <div className="h-[90%] m-auto w-[80%] animate__animated animate__fadeIn">
           {/* <h1 className="m-auto text-center text-3xl">Customize</h1> */}
-          <div className="flex flex-col mt-5 gap-y-3 border-gray-700">
+          <div className="customization-form-container flex flex-col mt-5 gap-y-3 border-gray-700">
             <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 pb-8 flex justify-center flex-col">
               <legend className="fieldset-legend text-lg">Background</legend>
               <label className="select border-inherit m-auto ">

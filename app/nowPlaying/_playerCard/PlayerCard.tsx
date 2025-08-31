@@ -152,7 +152,7 @@ const PlayerCard = (props: Props) => {
     
     if (Object.entries(player.current).length === 0 || !player.current.isPlaying) { 
         return (
-            <div className="skeleton" 
+            <div className="skeleton m-auto" 
                 style={{
                     width: `${1800*scalingFactor}px`,
                     height: `${320*scalingFactor}px`,
@@ -162,7 +162,7 @@ const PlayerCard = (props: Props) => {
     }
 
     return <>
-        <div id={PLAYER_CONTAINER_ID} className="animate__animated animate__fadeIn"
+        <div id={PLAYER_CONTAINER_ID} className="animate__animated animate__fadeIn m-auto"
             style={{
                 width: `${1800*scalingFactor}px`,
                 height: `${320*scalingFactor}px`,

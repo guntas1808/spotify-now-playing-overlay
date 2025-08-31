@@ -45,13 +45,16 @@ const LinkTextBox = (props: Props) => {
     }, [])
 
     return <>
-        <div className="mb-3 text-xl">Link:</div>
-        {urlString && urlString !== "" ?
-            <div className="animate__animated animate__fadeIn bg-base-300 rounded-box p-3 w-[700px] text-balance break-words overflow-hidden">
-                {`${origin}${urlString}?access_token=${accessToken}`}
-            </div> :
-            <div className="skeleton h-28 w-[700px]"/>
-        }           
+        <label>
+            <span className='text-lg floating-label'>Overlay Link</span>
+            {urlString && urlString !== "" ?
+                <div className="textlinkbox animate__animated animate__fadeIn bg-base-200 rounded-box p-6 w-[700px] text-balance break-words overflow-hidden">
+                    {`${origin}${urlString}?access_token=${accessToken}`}
+                </div> :
+                <div className="skeleton h-28 w-[700px]"/>
+            } 
+        </label>
+                  
     </>;
 }
 
