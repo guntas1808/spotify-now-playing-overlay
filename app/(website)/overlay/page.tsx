@@ -31,9 +31,9 @@ export default function OverlayPage() {
         <div className="h-[70%] m-auto w-[80%]">
           {/* <h1 className="m-auto text-center text-3xl">Customize</h1> */}
           <div className="flex flex-col mt-5 gap-y-3 border-gray-700">
-            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 pb-8">
+            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 pb-8 flex justify-center flex-col">
               <legend className="fieldset-legend text-lg">Background</legend>
-              <label className="select border-inherit m-auto  w-[400px]">
+              <label className="select border-inherit m-auto ">
                 <span className="label">Type:</span>
                 <select className="select-success" 
                         defaultValue={bgType || 'glass'} 
@@ -43,19 +43,31 @@ export default function OverlayPage() {
                   <option value="solid">Solid</option>
                 </select>
               </label>
-              {bgType == "solid" ?
-                <label
-                  htmlFor=""
-                  className="input input-success border-inherit m-auto w-[400px]"
-                >
-                  <span className="label">Color:</span>
-                  <input type="color" onChange={(event: ChangeEvent<HTMLInputElement>) => setBgColor(event.target.value)}/>
-                </label>
-                : null
+              {bgType == "solid" &&
+                <fieldset className="fieldset bg-base-300 border-base-300 mb-3 m-auto w-[700px] rounded-box border p-4">
+                  <legend className="fieldset-legend text-base">Color</legend>
+                  <div className="tabs bg-base-300 tabs-box m-auto w-[100%]">
+                    <input type="radio" name="my_tabs_2" className="tab" aria-label="Dynamic" />
+                    <div className="tab-content">
+                      <ColorPallete/>
+                    </div>
+                  
+                    <input type="radio" name="my_tabs_2" className="tab" aria-label="Static" defaultChecked />
+                    <div className="tab-content">
+                      <label
+                        htmlFor=""
+                        className="input input-success border-inherit m-auto w-[80%]"
+                      >
+                        <span className="label">Pick a color:</span>
+                        <input type="color" onChange={(event: ChangeEvent<HTMLInputElement>) => setBgColor(event.target.value)}/>
+                      </label>
+                    </div>
+                  </div>
+                </fieldset>
               }
               {bgType == "solid" ?
                 <label
-                  className="input m-auto w-[400px]">
+                  className="input border-inherit m-auto">
                   <span className="label">Opacity:</span>
                   <input 
                     type="range"
@@ -70,29 +82,32 @@ export default function OverlayPage() {
             </fieldset>
             <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 pb-8">
               <legend className="fieldset-legend text-lg">Text</legend>
-              <div className="tabs tabs-box m-auto w-[100%]">
-                <input type="radio" name="my_tabs_1" className="tab" aria-label="Dynamic Colors" />
-                <div className="tab-content">
-                  <ColorPallete/>
+              <fieldset className="fieldset bg-base-300 border-base-300 mb-3 m-auto w-[700px] rounded-box border p-4">
+                <legend className="fieldset-legend text-base">Color</legend>
+                <div className="tabs bg-base-300 tabs-box m-auto w-[100%]">
+                  <input type="radio" name="my_tabs_1" className="tab" aria-label="Dynamic" />
+                  <div className="tab-content">
+                    <ColorPallete/>
+                  </div>
+                  
+                  <input type="radio" name="my_tabs_1" className="tab" aria-label="Static" defaultChecked />
+                  <div className="tab-content">
+                    <label
+                      htmlFor=""
+                      className="input border-inherit m-auto"
+                    >
+                      <span className="label">Pick a Color:</span>
+                      <input type="color" 
+                              defaultValue={"#dcdcde"} 
+                              onChange={(event: ChangeEvent<HTMLInputElement>) => setTxtColor(event.target.value)}/>
+                    </label>
+                  </div>
                 </div>
-                
-                <input type="radio" name="my_tabs_1" className="tab" aria-label="Static Colors" defaultChecked />
-                <div className="tab-content">
-                  <label
-                    htmlFor=""
-                    className="input border-inherit m-auto w-[400px]"
-                  >
-                    <span className="label">Text Color:</span>
-                    <input type="color" 
-                            defaultValue={"#dcdcde"} 
-                            onChange={(event: ChangeEvent<HTMLInputElement>) => setTxtColor(event.target.value)}/>
-                  </label>
-                </div>
-              </div>
+              </fieldset>
             </fieldset>
-            <fieldset className="fieldset border-base-300 rounded-box w-xs border p-4 pb-8">
+            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 pb-8">
               <legend className="fieldset-legend text-lg">Size</legend>
-              <label className="input m-auto w-[400px]">
+              <label className="input m-auto border-inherit">
                 <span className="label">Width</span>
                 <input type="number" 
                         defaultValue={1500} 
