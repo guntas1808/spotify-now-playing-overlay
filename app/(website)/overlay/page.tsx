@@ -3,6 +3,7 @@
 import "./style.sass";
 import PlayerCard from "@/app/nowPlaying/_playerCard/PlayerCard";
 import { ChangeEvent, Suspense, useState } from "react";
+import ColorPallete from "./_colorPallete/ColorPallete";
 import LinkTextBox from "./_linkTextBox/LinkTextBox";
 
 
@@ -69,15 +70,25 @@ export default function OverlayPage() {
             </fieldset>
             <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 pb-8">
               <legend className="fieldset-legend text-lg">Text</legend>
-              <label
-                htmlFor=""
-                className="input border-inherit m-auto w-[400px]"
-              >
-                <span className="label">Text Color:</span>
-                <input type="color" 
-                        defaultValue={"#dcdcde"} 
-                        onChange={(event: ChangeEvent<HTMLInputElement>) => setTxtColor(event.target.value)}/>
-              </label>
+              <div className="tabs tabs-box m-auto w-[100%]">
+                <input type="radio" name="my_tabs_1" className="tab" aria-label="Dynamic Colors" />
+                <div className="tab-content">
+                  <ColorPallete/>
+                </div>
+                
+                <input type="radio" name="my_tabs_1" className="tab" aria-label="Static Colors" defaultChecked />
+                <div className="tab-content">
+                  <label
+                    htmlFor=""
+                    className="input border-inherit m-auto w-[400px]"
+                  >
+                    <span className="label">Text Color:</span>
+                    <input type="color" 
+                            defaultValue={"#dcdcde"} 
+                            onChange={(event: ChangeEvent<HTMLInputElement>) => setTxtColor(event.target.value)}/>
+                  </label>
+                </div>
+              </div>
             </fieldset>
             <fieldset className="fieldset border-base-300 rounded-box w-xs border p-4 pb-8">
               <legend className="fieldset-legend text-lg">Size</legend>
