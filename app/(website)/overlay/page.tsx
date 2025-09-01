@@ -13,6 +13,7 @@ export default function OverlayPage() {
   const [txtColor, setTxtColor] = useState<string>("");
   const [opacity, setOpacity] = useState<number>(100);
   const [width, setWidth] = useState<number>(1500);
+  console.log(txtColor);
 
   return (
     <div className="flex flex-row h-full">
@@ -55,7 +56,7 @@ export default function OverlayPage() {
                   <div className="tabs bg-base-300 tabs-box m-auto w-[100%]">
                     <input type="radio" name="my_tabs_2" className="tab" aria-label="Dynamic" />
                     <div className="tab-content">
-                      <ColorPallete/>
+                      <ColorPallete setColor={setBgColor}/>
                     </div>
                   
                     <input type="radio" name="my_tabs_2" className="tab" aria-label="Static" defaultChecked />
@@ -93,7 +94,7 @@ export default function OverlayPage() {
                 <div className="tabs bg-base-300 tabs-box m-auto w-[100%]">
                   <input type="radio" name="my_tabs_1" className="tab" aria-label="Dynamic" />
                   <div className="tab-content">
-                    <ColorPallete/>
+                    <ColorPallete setColor={setTxtColor}/>
                   </div>
                   
                   <input type="radio" name="my_tabs_1" className="tab" aria-label="Static" defaultChecked />

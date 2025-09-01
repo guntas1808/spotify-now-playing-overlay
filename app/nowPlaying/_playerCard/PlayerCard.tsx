@@ -4,6 +4,7 @@ import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { useEffect, useReducer, useRef } from "react";
 import PlayingAnimation from "../_playingAnimation/PlayingAnimation";
 import SpotifyApiResponseJson from "../schema";
+import { Vibrant } from "node-vibrant/browser";
 
 type Props = {
     width?: string,
@@ -40,7 +41,8 @@ const DEFAULTS = {
     OPACITY: "100"
 }
 const COOKIE_NAME = 'spotify-access-token';
-const PLAYER_CONTAINER_ID = 'player-conatiner';
+const PLAYER_CARD_ID = 'player-card';
+const DYNAMIC_COLORS = ["Vibrant","LightVibrant","DarkVibrant","Muted","LightMuted","DarkMuted"];
 
 async function getNowPlayingData() {
     const queryParams = new URLSearchParams(location.search);
@@ -97,7 +99,14 @@ function getPlayerUpdate(player: Player) {
 }
 
 function getHexWithOpacity(color: string, opacity: number) {
+    if (isDynamicColor(color)) {
+        return color;
+    }
     return color + ((opacity*255)/100).toString(16);
+}
+
+function isDynamicColor(color: string) {
+    return DYNAMIC_COLORS.includes(color);
 }
 
 function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
@@ -119,6 +128,25 @@ function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
     };
 }
 
+async function checkAndUpdateDynamicColor(bgColor: string, txtColor: string, imageUri: string) {
+    if (!isDynamicColor(txtColor) && !isDynamicColor(bgColor)) {
+        return
+    }
+    
+    const pallete = await Vibrant.from(imageUri).getPalette();
+    const playerCard = document.getElementById(PLAYER_CARD_ID) as HTMLDivElement;
+    if (!playerCard) {
+        return
+    }
+    
+    if (isDynamicColor(bgColor)) {
+        playerCard.style.backgroundColor = pallete[bgColor]?.hex ?? '';
+    }
+    if (isDynamicColor(txtColor)) {
+        playerCard.style.color = pallete[txtColor]?.hex ?? '';
+    }
+}
+
 const PlayerCard = (props: Props) => {
     const player = useRef(new Player);
     const [t, dispatch] = useReducer(t => t + 1, 0);
@@ -131,11 +159,10 @@ const PlayerCard = (props: Props) => {
     useEffect(() => {
         const divisor = Math.trunc(API_CALL_INTERVAL_MILLIS/RE_RENDER_INTERVAL_MILLIS);
         if (t%divisor === 0) {
-            const dataPromise = getNowPlayingData(); 
-            dataPromise.then((data) => {
+            getNowPlayingData().then((data) => {
                 const newPlayer = constructPlayer(data);
                 if (!newPlayer.isPlaying && player.current.isPlaying) {
-                    const playerContainer = document.getElementById(PLAYER_CONTAINER_ID);
+                    const playerContainer = document.getElementById(PLAYER_CARD_ID);
                     playerContainer?.classList.remove('animate__fadeIn');
                     playerContainer?.classList.add('animate__fadeOut');
                     setTimeout(() => player.current = newPlayer, 400);
@@ -147,6 +174,7 @@ const PlayerCard = (props: Props) => {
         } else if (player.current.isPlaying) {
             player.current = getPlayerUpdate(player.current);
         }
+        checkAndUpdateDynamicColor(styles.backgorund.color, styles.text.color, player.current.trackImageUri);
     }, [t])
     setTimeout(dispatch, RE_RENDER_INTERVAL_MILLIS)
     
@@ -162,31 +190,31 @@ const PlayerCard = (props: Props) => {
     }
 
     return <>
-        <div id={PLAYER_CONTAINER_ID} className="animate__animated animate__fadeIn m-auto"
+        <div className="animate__animated animate__fadeIn m-auto"
             style={{
                 width: `${1800*scalingFactor}px`,
                 height: `${320*scalingFactor}px`,
         }}>
-            <div className={`card opacity-100 card-side rounded-xl text-[#dadade] font-(family-name:--font-geist-sans) ${styles.backgorund.type === "glass" ? "glass" : ""}`}
+            <div id={PLAYER_CARD_ID} className={`card opacity-100 card-side rounded-xl text-[#dadade] font-(family-name:--font-geist-sans) ${styles.backgorund.type === "glass" ? "glass" : ""}`}
                 style = {(() => {
                     const fixedStyles = {
                         width: "1800px",
                         height: "320px",
                         transform: `scale(${scalingFactor})`,
                         transformOrigin: "top left",
-                        color: styles.text.color
+                        ...(isDynamicColor(styles.text.color) ? {} : {color: styles.text.color}),
                     }
                     if (styles.backgorund.type === "solid") {
-                        return {...fixedStyles, backgroundColor: styles.backgorund.color}
+                        return {...fixedStyles, ...(isDynamicColor(styles.backgorund.color) ? {} : { backgroundColor:styles.backgorund.color })}
                     } else if (styles.backgorund.type === "transparent") {
                         return  {...fixedStyles, backgroundColor: "transparent"};
                     }
                     return fixedStyles
                 })()}
                 >
-                <figure className='p-5 pr-0 relative'>
+                <figure className='p-6 pr-0 relative'>
                     {player.current.trackImageUri &&
-                        <img id="player-card-image" className="rounded-xl max-w-80 max-h-80"
+                        <img id="player-card-image" className=" shadow-lg shadow-base-300 rounded-xl max-w-80 max-h-80"
                             src={player.current.trackImageUri} 
                             alt=""/>
                     }

@@ -45,17 +45,22 @@ function getComplemetaryColor(colorHex: string | undefined) {
     return luminance > 0.5 ? '#000000' : '#ffffff';
 }
 
-function updateSelectedColor(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+function updateSelectedColor(event: React.MouseEvent<HTMLDivElement, MouseEvent>, setColor: Dispatch<SetStateAction<string>>) {
     const div = event.currentTarget;
     if (div.parentElement?.classList.contains('selected')) {
         return;
     }
     const selectedContainer = document.querySelector('.pallete-color-container.selected');
     selectedContainer?.classList.remove('selected');
-    div.parentElement?.classList.add('selected');     
+    div.parentElement?.classList.add('selected');
+    const color = div.getAttribute('data-color');
+    if (color) {
+        console.log(`color is ${color}`)
+        setColor(color);
+    } 
 }
 
-const ColorPallete = () => {
+const ColorPallete = (props: {setColor: Dispatch<SetStateAction<string>>}) => {
     const [dynamicColors, setDynamicColors] = useState<DynamicColors>({});
 
     useEffect(() => {
@@ -80,7 +85,7 @@ const ColorPallete = () => {
                         color: getComplemetaryColor(dynamicColors[colorKey])
                     }}
                     key={`color-pallete-${color}`}
-                    onClick={updateSelectedColor}
+                    onClick={(event) => updateSelectedColor(event, props.setColor)}
                 >{color}</div>
             </div>      
         )
