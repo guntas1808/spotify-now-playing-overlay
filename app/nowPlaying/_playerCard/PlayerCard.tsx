@@ -13,6 +13,15 @@ type Props = {
     txtColor?: string,
     opacity?: number
 }
+type Styles = {
+    background: {
+        type: string,
+        color: string 
+    },
+    text: {
+        color: string
+    }
+}
 class TimeStamp {
     millis: number = -1;
     secs: string = "";
@@ -29,6 +38,7 @@ class Player {
     progress: TimeStamp = new TimeStamp;
     duration: TimeStamp = new TimeStamp;
     isPlaying: boolean = false;
+    colors: {bg: string, txt: string} = {bg: '', txt: ''};
 }
 const spotiyNowPlayingEndpoint = "https://api.spotify.com/v1/me/player/currently-playing";
 const RE_RENDER_INTERVAL_MILLIS = 10;
@@ -72,7 +82,7 @@ function getFormattedDuration(millis: number): {mins: string, secs: string, mill
     return {mins: minsStr, secs: secsStr, millis};
 }
 
-function constructPlayer(rawData: SpotifyApiResponseJson) {
+async function constructPlayer(rawData: SpotifyApiResponseJson, styles: Styles) {
     const trackName = rawData.item.name;
     const trackImageUri = rawData.item.album.images[0].url;
     const artistNames: string[] = []
@@ -84,17 +94,28 @@ function constructPlayer(rawData: SpotifyApiResponseJson) {
     const durationMillis = rawData.item.duration_ms;
     const duration = getFormattedDuration(durationMillis);
     const isPlaying = rawData.is_playing;
+    const colors = await getColorsInHex(styles.background.color, styles.text.color, trackImageUri) ?? 
+                        {bg: styles.background.color, txt: styles.text.color};
 
-    return {trackName,trackImageUri,artistNames,progress, duration, isPlaying}
+    return {trackName,trackImageUri,artistNames,progress, duration, isPlaying, colors}
 }
 
-function getPlayerUpdate(player: Player) {
+async function getActualPlayerUpdate(styles: Styles) {
+    const rawData = await getNowPlayingData();
+    const player = await constructPlayer(rawData, styles);
+    return player;
+}
+
+async function getExpectedPlayerUpdate(player: Player, styles: Styles) {
     const progress = player.progress;
     const millis = progress.millis + RE_RENDER_INTERVAL_MILLIS;
+    const colors = await getColorsInHex(styles.background.color, styles.text.color, player.trackImageUri) ?? 
+                        {bg: styles.background.color, txt: styles.text.color};
     
     return {
         ...player,
-        progress: getFormattedDuration(millis)
+        progress: getFormattedDuration(millis),
+        colors
     }
 }
 
@@ -118,7 +139,7 @@ function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
     const opacity = props.opacity ?? parseInt(queryParams.get("opacity") ?? DEFAULTS.OPACITY);
 
     return {
-        backgorund : {
+        background : {
             type: bgType,
             color: getHexWithOpacity(bgColor, opacity)
         },
@@ -128,7 +149,7 @@ function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
     };
 }
 
-async function checkAndUpdateDynamicColor(bgColor: string, txtColor: string, imageUri: string) {
+async function getColorsInHex(bgColor: string, txtColor: string, imageUri: string) {
     if (!isDynamicColor(txtColor) && !isDynamicColor(bgColor)) {
         return
     }
@@ -138,29 +159,26 @@ async function checkAndUpdateDynamicColor(bgColor: string, txtColor: string, ima
     if (!playerCard) {
         return
     }
-    
-    if (isDynamicColor(bgColor)) {
-        playerCard.style.backgroundColor = pallete[bgColor]?.hex ?? '';
-    }
-    if (isDynamicColor(txtColor)) {
-        playerCard.style.color = pallete[txtColor]?.hex ?? '';
-    }
+
+    return {
+        ...(isDynamicColor(bgColor) ? { bg: pallete[bgColor]?.hex ?? ''} : { bg:bgColor }),
+        ...(isDynamicColor(txtColor) ? { txt: pallete[txtColor]?.hex ?? '' } : { txt: txtColor })
+    };
 }
 
 const PlayerCard = (props: Props) => {
-    const player = useRef(new Player);
-    const [t, dispatch] = useReducer(t => t + 1, 0);
-
     const queryParams = useSearchParams();
     const width = props.width ?? queryParams.get("width") ?? "1800";
     const scalingFactor = parseInt(width)/1800;
     const styles = getStyles(props, queryParams);
+    
+    const player = useRef(new Player({colors: { bg: styles.background.color, txt: styles.text.color}}));
+    const [t, dispatch] = useReducer(t => t + 1, 0);
 
     useEffect(() => {
         const divisor = Math.trunc(API_CALL_INTERVAL_MILLIS/RE_RENDER_INTERVAL_MILLIS);
         if (t%divisor === 0) {
-            getNowPlayingData().then((data) => {
-                const newPlayer = constructPlayer(data);
+            getActualPlayerUpdate(styles).then(newPlayer => {
                 if (!newPlayer.isPlaying && player.current.isPlaying) {
                     const playerContainer = document.getElementById(PLAYER_CARD_ID);
                     playerContainer?.classList.remove('animate__fadeIn');
@@ -172,9 +190,8 @@ const PlayerCard = (props: Props) => {
             });
             return;
         } else if (player.current.isPlaying) {
-            player.current = getPlayerUpdate(player.current);
+            getExpectedPlayerUpdate(player.current, styles).then(newPlayer => player.current = newPlayer);
         }
-        checkAndUpdateDynamicColor(styles.backgorund.color, styles.text.color, player.current.trackImageUri);
     }, [t])
     setTimeout(dispatch, RE_RENDER_INTERVAL_MILLIS)
     
@@ -195,18 +212,18 @@ const PlayerCard = (props: Props) => {
                 width: `${1800*scalingFactor}px`,
                 height: `${320*scalingFactor}px`,
         }}>
-            <div id={PLAYER_CARD_ID} className={`card opacity-100 card-side rounded-xl text-[#dadade] font-(family-name:--font-geist-sans) ${styles.backgorund.type === "glass" ? "glass" : ""}`}
+            <div id={PLAYER_CARD_ID} className={`card opacity-100 card-side rounded-xl text-[#dadade] font-(family-name:--font-geist-sans) ${styles.background.type === "glass" ? "glass" : ""}`}
                 style = {(() => {
                     const fixedStyles = {
                         width: "1800px",
                         height: "320px",
                         transform: `scale(${scalingFactor})`,
                         transformOrigin: "top left",
-                        ...(isDynamicColor(styles.text.color) ? {} : {color: styles.text.color}),
+                        color: player.current.colors.txt,
                     }
-                    if (styles.backgorund.type === "solid") {
-                        return {...fixedStyles, ...(isDynamicColor(styles.backgorund.color) ? {} : { backgroundColor:styles.backgorund.color })}
-                    } else if (styles.backgorund.type === "transparent") {
+                    if (styles.background.type === "solid") {
+                        return {...fixedStyles, backgroundColor: player.current.colors.bg }
+                    } else if (styles.background.type === "transparent") {
                         return  {...fixedStyles, backgroundColor: "transparent"};
                     }
                     return fixedStyles
@@ -218,7 +235,7 @@ const PlayerCard = (props: Props) => {
                             src={player.current.trackImageUri} 
                             alt=""/>
                     }
-                    <PlayingAnimation color={styles.text.color}/>
+                    <PlayingAnimation color={player.current.colors.txt}/>
                 </figure>
                 <div className="card-body m-auto ml-5">
                     <div className="pb-8">
@@ -237,8 +254,8 @@ const PlayerCard = (props: Props) => {
                                 value={player.current.progress.millis} 
                                 max={player.current.duration.millis}
                                 style={{
-                                    color: styles.text.color,
-                                    backgroundColor: `color-mix(in srgb, ${styles.text.color} 20%, transparent)`
+                                    color: player.current.colors.txt,
+                                    backgroundColor: `color-mix(in srgb, ${player.current.colors.txt} 20%, transparent)`
                                 }}/>
                         <div className='text-4xl'>
                             {player.current.duration.mins}:{player.current.duration.secs}
