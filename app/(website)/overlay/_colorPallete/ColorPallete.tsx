@@ -50,12 +50,15 @@ function updateSelectedColor(event: React.MouseEvent<HTMLDivElement, MouseEvent>
     if (div.parentElement?.classList.contains('selected')) {
         return;
     }
-    const selectedContainer = document.querySelector('.pallete-color-container.selected');
-    selectedContainer?.classList.remove('selected');
+    
+    Array.from(div.parentElement?.parentElement?.children ?? []).forEach((child) => {
+        if (child.classList.contains('selected')) {
+            child.classList.remove('selected');
+        }
+    })
     div.parentElement?.classList.add('selected');
     const color = div.getAttribute('data-color');
     if (color) {
-        console.log(`color is ${color}`)
         setColor(color);
     } 
 }
