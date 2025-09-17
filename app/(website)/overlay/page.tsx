@@ -35,7 +35,7 @@ export default function OverlayPage() {
         </div>
       </div>
       <div className="w-[55%] h-full flex overflow-clip">
-        <div className="h-[90%] m-auto w-[80%] animate__animated animate__fadeIn">
+        <div className="h-[90%] m-auto w-[80%] animate__animated animate__fadeIn overflow-y-auto">
           {/* <h1 className="m-auto text-center text-3xl">Customize</h1> */}
           <div className="customization-form-container flex flex-col mt-5 gap-y-3 border-gray-700">
             <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 pb-8 flex justify-center flex-col">

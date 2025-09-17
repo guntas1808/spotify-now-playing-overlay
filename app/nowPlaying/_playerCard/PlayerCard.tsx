@@ -1,169 +1,34 @@
 'use client';
 
-import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import { useEffect, useReducer, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { RefObject, useEffect, useReducer, useRef } from "react";
 import PlayingAnimation from "../_playingAnimation/PlayingAnimation";
-import SpotifyApiResponseJson from "../schema";
-import { Vibrant } from "node-vibrant/browser";
+import { getActualPlayerUpdate, getExpectedPlayerUpdate, getStyles } from "./helper";
+import { PlayerCardType, Props, Styles } from "./player-card.types";
+import { API_CALL_INTERVAL_MILLIS, PLAYER_CARD_ID, RE_RENDER_INTERVAL_MILLIS } from "./constants";
 
-type Props = {
-    width?: string,
-    bgType?: string,
-    bgColor?: string,
-    txtColor?: string,
-    opacity?: number
-}
-type Styles = {
-    background: {
-        type: string,
-        color: string 
-    },
-    text: {
-        color: string
+const updatePlayer = (t: number, styles: Styles, playerCard: RefObject<PlayerCardType | undefined>) => {
+    const divisor = Math.trunc(API_CALL_INTERVAL_MILLIS/RE_RENDER_INTERVAL_MILLIS);
+    if (t%divisor === 0) {
+        getActualPlayerUpdate(styles).then(newPlayerCard => {
+            if (!newPlayerCard) {
+                playerCard.current = undefined;
+                return
+            }
+            
+            if (playerCard.current && Object.keys(playerCard.current).length !== 0 && !newPlayerCard.player.isPlaying && playerCard.current.player?.isPlaying) {
+                const playerContainer = document.getElementById(PLAYER_CARD_ID);
+                playerContainer?.classList.remove('animate__fadeIn');
+                playerContainer?.classList.add('animate__fadeOut');
+                setTimeout(() => playerCard.current = newPlayerCard, 500);
+            } else if (!playerCard.current || newPlayerCard.player.isPlaying || playerCard.current.player.isPlaying) {
+                playerCard.current  = newPlayerCard;
+            }
+        });
+        return;
+    } else if (playerCard.current && playerCard.current.player.isPlaying) {
+        getExpectedPlayerUpdate(playerCard.current).then(newPlayerCard => playerCard.current  = newPlayerCard);
     }
-}
-class TimeStamp {
-    millis: number = -1;
-    secs: string = "";
-    mins: string = "";
-}
-class Player {
-    constructor(init? : Partial<Player>) {
-        Object.assign(this, init);
-    }
-
-    trackImageUri: string = "";
-    trackName: string = "";
-    artistNames: string[] = [];
-    progress: TimeStamp = new TimeStamp;
-    duration: TimeStamp = new TimeStamp;
-    isPlaying: boolean = false;
-    colors: {bg: string, txt: string} = {bg: '', txt: ''};
-}
-const spotiyNowPlayingEndpoint = "https://api.spotify.com/v1/me/player/currently-playing";
-const RE_RENDER_INTERVAL_MILLIS = 10;
-const API_CALL_INTERVAL_MILLIS = 3000;
-const DEFAULTS = {
-    BG_TYPE: "glass",
-    BG_COLOR: "#000000ff",
-    TXT_COLOR: "#dcdcde",
-    TXT_FONT: "",
-    OPACITY: "100"
-}
-const COOKIE_NAME = 'spotify-access-token';
-const PLAYER_CARD_ID = 'player-card';
-const DYNAMIC_COLORS = ["Vibrant","LightVibrant","DarkVibrant","Muted","LightMuted","DarkMuted"];
-
-async function getNowPlayingData() {
-    const queryParams = new URLSearchParams(location.search);
-    const accessTokenFromCookie = (await window.cookieStore.get(COOKIE_NAME))?.value;
-    const accessToken = accessTokenFromCookie ?? queryParams.get("access_token") ?? "";
-    
-    const headers = {
-        'Authorization': `Bearer ${accessToken}`
-    }
-    try {
-        const response = await fetch(spotiyNowPlayingEndpoint, {headers});
-        const data = response.status === 200 ? await response.json() : {};
-        return data;
-    } catch (error) {
-        console.error(error);
-        return new Promise((resolve) => resolve({}));
-    }
-}
-
-function getFormattedDuration(millis: number): {mins: string, secs: string, millis: number} {
-    const mins = Math.trunc(millis/60000);
-    const secs = Math.trunc(millis/1000) - mins*60;
-    
-    const minsStr = mins.toString();
-    const secsStr = secs < 10 ? "0".concat(secs.toString()) : secs.toString();
-
-    return {mins: minsStr, secs: secsStr, millis};
-}
-
-async function constructPlayer(rawData: SpotifyApiResponseJson, styles: Styles) {
-    const trackName = rawData.item.name;
-    const trackImageUri = rawData.item.album.images[0].url;
-    const artistNames: string[] = []
-    rawData.item.artists.forEach(artist => {
-        artistNames.push(artist.name)
-    });
-    const progressMillis = rawData.progress_ms;
-    const progress = getFormattedDuration(progressMillis);
-    const durationMillis = rawData.item.duration_ms;
-    const duration = getFormattedDuration(durationMillis);
-    const isPlaying = rawData.is_playing;
-    const colors = await getColorsInHex(styles.background.color, styles.text.color, trackImageUri) ?? 
-                        {bg: styles.background.color, txt: styles.text.color};
-
-    return {trackName,trackImageUri,artistNames,progress, duration, isPlaying, colors}
-}
-
-async function getActualPlayerUpdate(styles: Styles) {
-    const rawData = await getNowPlayingData();
-    const player = await constructPlayer(rawData, styles);
-    return player;
-}
-
-async function getExpectedPlayerUpdate(player: Player, styles: Styles) {
-    const progress = player.progress;
-    const millis = progress.millis + RE_RENDER_INTERVAL_MILLIS;
-    const colors = await getColorsInHex(styles.background.color, styles.text.color, player.trackImageUri) ?? 
-                        {bg: styles.background.color, txt: styles.text.color};
-    
-    return {
-        ...player,
-        progress: getFormattedDuration(millis),
-        colors
-    }
-}
-
-function getHexWithOpacity(color: string, opacity: number) {
-    if (isDynamicColor(color)) {
-        return color;
-    }
-    return color + ((opacity*255)/100).toString(16);
-}
-
-function isDynamicColor(color: string) {
-    return DYNAMIC_COLORS.includes(color);
-}
-
-function getStyles(props: Props, queryParams: ReadonlyURLSearchParams) {
-    const bgType = props.bgType || queryParams.get("bg") || DEFAULTS.BG_TYPE;
-    const bgColor =  (bgType === "solid") ? 
-        (props.bgColor || queryParams.get("bgcolor") || DEFAULTS.BG_COLOR) : 
-        DEFAULTS.BG_COLOR;
-    const textColor = props.txtColor || queryParams.get("txtcolor") || DEFAULTS.TXT_COLOR;
-    const opacity = props.opacity ?? parseInt(queryParams.get("opacity") ?? DEFAULTS.OPACITY);
-
-    return {
-        background : {
-            type: bgType,
-            color: getHexWithOpacity(bgColor, opacity)
-        },
-        text: {
-            color: textColor 
-        }
-    };
-}
-
-async function getColorsInHex(bgColor: string, txtColor: string, imageUri: string) {
-    if (!isDynamicColor(txtColor) && !isDynamicColor(bgColor)) {
-        return
-    }
-    
-    const pallete = await Vibrant.from(imageUri).getPalette();
-    const playerCard = document.getElementById(PLAYER_CARD_ID) as HTMLDivElement;
-    if (!playerCard) {
-        return
-    }
-
-    return {
-        ...(isDynamicColor(bgColor) ? { bg: pallete[bgColor]?.hex ?? ''} : { bg:bgColor }),
-        ...(isDynamicColor(txtColor) ? { txt: pallete[txtColor]?.hex ?? '' } : { txt: txtColor })
-    };
 }
 
 const PlayerCard = (props: Props) => {
@@ -172,30 +37,13 @@ const PlayerCard = (props: Props) => {
     const scalingFactor = parseInt(width)/1800;
     const styles = getStyles(props, queryParams);
     
-    const player = useRef(new Player({colors: { bg: styles.background.color, txt: styles.text.color}}));
+    const playerCard = useRef<PlayerCardType | undefined>(undefined);
     const [t, dispatch] = useReducer(t => t + 1, 0);
 
-    useEffect(() => {
-        const divisor = Math.trunc(API_CALL_INTERVAL_MILLIS/RE_RENDER_INTERVAL_MILLIS);
-        if (t%divisor === 0) {
-            getActualPlayerUpdate(styles).then(newPlayer => {
-                if (!newPlayer.isPlaying && player.current.isPlaying) {
-                    const playerContainer = document.getElementById(PLAYER_CARD_ID);
-                    playerContainer?.classList.remove('animate__fadeIn');
-                    playerContainer?.classList.add('animate__fadeOut');
-                    setTimeout(() => player.current = newPlayer, 400);
-                } else if (newPlayer.isPlaying || player.current.isPlaying) {
-                    player.current = newPlayer
-                }
-            });
-            return;
-        } else if (player.current.isPlaying) {
-            getExpectedPlayerUpdate(player.current, styles).then(newPlayer => player.current = newPlayer);
-        }
-    }, [t])
+    useEffect(() => updatePlayer(t, styles, playerCard), [t])
     setTimeout(dispatch, RE_RENDER_INTERVAL_MILLIS)
     
-    if (Object.entries(player.current).length === 0 || !player.current.isPlaying) { 
+    if (!playerCard.current || !playerCard.current.player.isPlaying) {
         return (
             <div className="skeleton m-auto" 
                 style={{
@@ -219,10 +67,10 @@ const PlayerCard = (props: Props) => {
                         height: "320px",
                         transform: `scale(${scalingFactor})`,
                         transformOrigin: "top left",
-                        color: player.current.colors.txt,
+                        color: playerCard.current.styles.txt.color,
                     }
                     if (styles.background.type === "solid") {
-                        return {...fixedStyles, backgroundColor: player.current.colors.bg }
+                        return {...fixedStyles, backgroundColor: playerCard.current.styles.bg.color }
                     } else if (styles.background.type === "transparent") {
                         return  {...fixedStyles, backgroundColor: "transparent"};
                     }
@@ -230,35 +78,35 @@ const PlayerCard = (props: Props) => {
                 })()}
                 >
                 <figure className='p-6 pr-0 relative'>
-                    {player.current.trackImageUri &&
+                    {playerCard.current.player.trackImageUri &&
                         <img id="player-card-image" className=" shadow-lg shadow-base-300 rounded-xl max-w-80 max-h-80"
-                            src={player.current.trackImageUri} 
+                            src={playerCard.current.player.trackImageUri} 
                             alt=""/>
                     }
-                    <PlayingAnimation color={player.current.colors.txt}/>
+                    <PlayingAnimation color={playerCard.current.styles.txt.color}/>
                 </figure>
                 <div className="card-body m-auto ml-5">
                     <div className="pb-8">
                         <div className="text-7xl tracking-normal pb-4">
-                            {player.current.trackName.trim()}
+                            {playerCard.current.player.trackName.trim()}
                         </div>
                         <span className='text-5xl'>
-                            {player.current.artistNames.join(', ')}
+                            {playerCard.current.player.artistNames.join(', ')}
                         </span>
                     </div>
                     <div className="progress-bar flex">
                         <div className='text-4xl'>
-                            {player.current.progress.mins}:{player.current.progress.secs}
+                            {playerCard.current.player.progress.display.mins}:{playerCard.current.player.progress.display.secs}
                         </div>
                         <progress className="progress my-auto mx-3 rounded-xl h-[14px]" 
-                                value={player.current.progress.millis} 
-                                max={player.current.duration.millis}
+                                value={playerCard.current.player.progress.millis} 
+                                max={playerCard.current.player.duration.millis}
                                 style={{
-                                    color: player.current.colors.txt,
-                                    backgroundColor: `color-mix(in srgb, ${player.current.colors.txt} 20%, transparent)`
+                                    color: playerCard.current.styles.txt.color,
+                                    backgroundColor: `color-mix(in srgb, ${playerCard.current.styles.txt.color} 20%, transparent)`
                                 }}/>
                         <div className='text-4xl'>
-                            {player.current.duration.mins}:{player.current.duration.secs}
+                            {playerCard.current.player.duration.display.mins}:{playerCard.current.player.duration.display.secs}
                         </div>
                     </div>
                 </div>

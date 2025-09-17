@@ -76,10 +76,10 @@ const ColorPallete = (props: {setColor: Dispatch<SetStateAction<string>>}) => {
         )
     }
 
-    const colorBadges = Object.keys(dynamicColors).map((color, idx) => {
+    const colorBadges = Object.keys(dynamicColors).map((color) => {
         const colorKey = color as keyof DynamicColors;
         return (
-            <div key={`color-pallete-container-${color}`} className={`pallete-color-container${idx === 0 ? ' selected' : ''}`}>
+            <div key={`color-pallete-container-${color}`} className={`pallete-color-container`}>
                 <div id="color-pallete-vibrant" 
                     className="pallete-color badge badge-soft"
                     data-color={color}
