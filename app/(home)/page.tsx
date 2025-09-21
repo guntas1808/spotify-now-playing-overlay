@@ -1,10 +1,11 @@
-import { LOCATION_ORIGIN_HEADER_NAME } from '@/middleware';
+import { ACCESS_TOKEN_HEADER_NAME, LOCATION_ORIGIN_HEADER_NAME } from '@/middleware';
 import buildUrl from 'build-url';
+import { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
 import {headers} from 'next/headers'
 import Image from 'next/image';
+import { redirect, RedirectType } from 'next/navigation';
 
-async function getSpotifyLoginUri(): Promise<string> {
-  const headerList = await headers();
+async function getSpotifyLoginUri(headerList: ReadonlyHeaders): Promise<string> {
   const origin = headerList.get(LOCATION_ORIGIN_HEADER_NAME);
   const redirectUri: string = `${origin}/redirect`
   const queryParams = {
@@ -19,7 +20,12 @@ async function getSpotifyLoginUri(): Promise<string> {
 }
 
 export default async function Home() {
-  const loginUri = await getSpotifyLoginUri();
+  const headerList = await headers();
+
+  if (headerList.get(ACCESS_TOKEN_HEADER_NAME)) {
+    redirect('/overlay', RedirectType.replace);
+  }
+  const loginUri = await getSpotifyLoginUri(headerList);
   
   return (
     <>
