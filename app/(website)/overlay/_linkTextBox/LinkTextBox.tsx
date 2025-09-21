@@ -1,5 +1,6 @@
 'use client';
 
+import { SPOTIFY_TOKEN_COOKIE_NAME } from '@/lib/constants';
 import BuildUrl from 'build-url';
 import React, { useEffect, useState } from 'react'
 
@@ -11,7 +12,6 @@ type Props = {
     txtColor: string,
     opacity: number
 }
-const COOKIE_NAME = 'spotify-access-token';
 
 const LinkTextBox = (props: Props) => {
     const [accessToken, setAccessToken] = useState<string>('');
@@ -30,7 +30,7 @@ const LinkTextBox = (props: Props) => {
 
     useEffect(() => {
         const updateAccessToken = async () => {
-            const cookie = await window.cookieStore.get(COOKIE_NAME);
+            const cookie = await window.cookieStore.get(SPOTIFY_TOKEN_COOKIE_NAME);
             if (!cookie || !cookie.value) {
                 location.replace(location.origin);
                 return;
@@ -47,11 +47,11 @@ const LinkTextBox = (props: Props) => {
     return <>
         <label>
             <span className='text-lg floating-label'>Overlay Link</span>
-            {urlString && urlString !== "" ?
-                <div className="textlinkbox animate__animated animate__fadeIn bg-base-200 rounded-box p-6 w-[700px] text-balance break-words overflow-hidden">
+            {urlString && urlString !== '' ?
+                <div className='textlinkbox animate__animated animate__fadeIn bg-base-200 rounded-box p-6 w-[700px] text-balance break-words overflow-hidden'>
                     {`${origin}${urlString}?access_token=${accessToken}`}
                 </div> :
-                <div className="skeleton h-28 w-[700px]"/>
+                <div className='skeleton h-28 w-[700px]'/>
             } 
         </label>
                   

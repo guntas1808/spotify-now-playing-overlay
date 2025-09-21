@@ -72,7 +72,7 @@ const ColorPallete = (props: {setColor: Dispatch<SetStateAction<string>>}) => {
 
     if (!dynamicColors || Object.keys(dynamicColors).length === 0) {
         return (
-            <span className="loading loading-spinner loading-lg"></span>
+            <span className='loading loading-spinner loading-lg'></span>
         )
     }
 
@@ -80,8 +80,8 @@ const ColorPallete = (props: {setColor: Dispatch<SetStateAction<string>>}) => {
         const colorKey = color as keyof DynamicColors;
         return (
             <div key={`color-pallete-container-${color}`} className={`pallete-color-container`}>
-                <div id="color-pallete-vibrant" 
-                    className="pallete-color badge badge-soft"
+                <div id='color-pallete-vibrant' 
+                    className='pallete-color badge badge-soft'
                     data-color={color}
                     style={{
                         backgroundColor: dynamicColors[colorKey], 

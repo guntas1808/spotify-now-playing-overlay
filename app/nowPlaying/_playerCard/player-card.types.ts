@@ -1,4 +1,4 @@
-import { Player } from "@/types/player.types";
+import { Player } from '@/types/player.types';
 
 export type Styles = {
     background: {

@@ -1,16 +1,16 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import { Suspense } from "react";
-import "../globals.css"
+import { Geist, Geist_Mono } from 'next/font/google';
+import { Suspense } from 'react';
+import '../globals.css'
 import 'animate.css';
 
 const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
+    variable: '--font-geist-sans',
+    subsets: ['latin'],
   });
   
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 
@@ -20,7 +20,7 @@ export default function NowPlayingLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html data-theme="forest" lang="en" className="bg-transparent">
+    <html data-theme='forest' lang='en' className='bg-transparent'>
         <body 
             className={`${geistSans.variable} ${geistMono.variable} bg-transparent antialiased`}>         
             <Suspense>
