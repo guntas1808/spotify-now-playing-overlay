@@ -1,9 +1,6 @@
-import { NextResponse } from 'next/server'
-import { NextRequest } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { SPOTIFY_TOKEN_COOKIE_NAME } from './lib/constants';
-
-export const LOCATION_ORIGIN_HEADER_NAME = 'x-location-origin';
-export const ACCESS_TOKEN_HEADER_NAME = 'x-access-token';
+import { LOCATION_ORIGIN_HEADER_NAME, ACCESS_TOKEN_HEADER_NAME } from './lib/middleware-constants';
 
 export function middleware(request: NextRequest) {
     const headers = new Headers(request.headers);
