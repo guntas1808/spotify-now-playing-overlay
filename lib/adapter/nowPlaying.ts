@@ -1,7 +1,7 @@
 import { Player, StreamingService } from '@/types/player.types';
 import { STREAMING_SERVICE } from '../constants';
 import { nowPlaying } from '../api/spotify';
-import SpotifyApiResponseJson from '../api/spotify.types';
+import { SpotifyApiResponseJson } from '../api/spotify.types';
 import { getFormattedDuration } from '../util/playerUtils';
 
 export async function getPlayer(streamingService: StreamingService): Promise<Player | undefined> {

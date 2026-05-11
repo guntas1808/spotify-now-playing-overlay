@@ -25,7 +25,7 @@ export default function WebsiteLayout({
       <body 
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}>      
         <div className='h-screen w-full'>
-          <header className='h-[15%] p-5 flex bg-neutral text-neutral-content'>
+          <header className='h-[10%] p-5 flex bg-neutral text-neutral-content'>
             <div className='card card-side'>
               <figure>
                 <Image
@@ -41,10 +41,10 @@ export default function WebsiteLayout({
                 Spotify Overlay for OBS
             </Link>
           </header>
-          <div className='h-[75%]'>
+          <div className='h-[82%]'>
             {children}
           </div>
-          <footer className='h-[10%] gap-1 footer footer-horizontal footer-center bg-neutral text-neutral-content p-5'>
+          <footer className='h-[8%] gap-1 footer footer-horizontal footer-center bg-neutral text-neutral-content p-5'>
             <aside className=''>
               <p className='font-bold text-xl'>
                 Developed by: Guntas Brar

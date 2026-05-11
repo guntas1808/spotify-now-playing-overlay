@@ -1,6 +1,6 @@
 'use client';
 
-import { SPOTIFY_TOKEN_COOKIE_NAME } from '@/lib/constants';
+import { SPOTIFY_ACCESS_TOKEN_COOKIE_NAME } from '@/lib/constants';
 import BuildUrl from 'build-url';
 import React, { useEffect, useState } from 'react'
 
@@ -30,7 +30,7 @@ const LinkTextBox = (props: Props) => {
 
     useEffect(() => {
         const updateAccessToken = async () => {
-            const cookie = await window.cookieStore.get(SPOTIFY_TOKEN_COOKIE_NAME);
+            const cookie = await window.cookieStore.get(SPOTIFY_ACCESS_TOKEN_COOKIE_NAME);
             if (!cookie || !cookie.value) {
                 location.replace(location.origin);
                 return;

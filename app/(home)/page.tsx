@@ -1,17 +1,18 @@
-import { ACCESS_TOKEN_HEADER_NAME, LOCATION_ORIGIN_HEADER_NAME } from '@/lib/middleware-constants';
+import { SPOTIFY_ACCESS_TOKEN_COOKIE_NAME } from '@/lib/constants';
 import buildUrl from 'build-url';
 import crypto from 'crypto';
 import { cookies, headers } from 'next/headers'
 import Image from 'next/image';
 import { redirect, RedirectType } from 'next/navigation';
 
+const ORIGIN_HEADER_KEY = 'origin';
+const SPOTIFY_AUTH_URI = 'https://accounts.spotify.com/authorize';
+const SPOTIFY_CLIENT_ID = 'e260bec14eb448219fd414c6d880cd8d';
+
 async function handleLogin() {
   'use server';
   const headerList = await headers();
-  let origin = headerList.get(LOCATION_ORIGIN_HEADER_NAME) || 'http://127.0.0.1:3000';
-  
-  // Spotify does not allow 'localhost' in redirect URIs. Use the loopback IP instead.
-  origin = origin.replace(/^http:\/\/localhost/, 'http://127.0.0.1');
+  const origin = headerList.get(ORIGIN_HEADER_KEY);
   const redirectUri = `${origin}/redirect`;
 
   const verifier = crypto.randomBytes(64).toString('base64url');
@@ -20,7 +21,7 @@ async function handleLogin() {
   (await cookies()).set('spotify_code_verifier', verifier);
 
   const queryParams = {
-    client_id: 'e260bec14eb448219fd414c6d880cd8d',
+    client_id: SPOTIFY_CLIENT_ID,
     redirect_uri: redirectUri,
     response_type: 'code',
     scope: 'user-read-currently-playing',
@@ -28,14 +29,11 @@ async function handleLogin() {
     code_challenge: challenge,
   };
 
-  const spotifyAuthUri = 'https://accounts.spotify.com/authorize';
-  redirect(buildUrl(spotifyAuthUri, { queryParams }));
+  redirect(buildUrl(SPOTIFY_AUTH_URI, { queryParams }));
 }
 
 export default async function Home() {
-  const headerList = await headers();
-
-  if (headerList.get(ACCESS_TOKEN_HEADER_NAME)) {
+  if ((await cookies()).get(SPOTIFY_ACCESS_TOKEN_COOKIE_NAME)) {
     redirect('/overlay', RedirectType.replace);
   }
   
