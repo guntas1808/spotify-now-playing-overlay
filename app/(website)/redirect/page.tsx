@@ -1,7 +1,7 @@
 'use client';
 
 import { SpotifyAccessTokenResponse } from '@/lib/api/spotify.types';
-import { SPOTIFY_ACCESS_TOKEN_COOKIE_NAME } from '@/lib/constants';
+import { SPOTIFY_ACCESS_TOKEN_COOKIE_NAME, SPOTIFY_REFRESH_TOKEN_COOKIE_NAME } from '@/lib/constants';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -45,6 +45,8 @@ async function authenticateAndRedirect(router: AppRouterInstance) {
       return;
     }
 
+    await window.cookieStore.delete('spotify_code_verifier');
+    await window.cookieStore.set(SPOTIFY_REFRESH_TOKEN_COOKIE_NAME, response.refresh_token);
     await window.cookieStore.set({
       name: SPOTIFY_ACCESS_TOKEN_COOKIE_NAME,
       value: response.access_token,

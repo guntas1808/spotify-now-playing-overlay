@@ -1,19 +1,7 @@
-import { redirect } from 'next/navigation';
-import { SPOTIFY_ACCESS_TOKEN_COOKIE_NAME } from '../constants';
 import { SpotifyApiResponseJson } from './spotify.types';
-import { RedirectType } from 'next/navigation';
+import { getAccessToken } from '../util/accessTokenUtils';
 
 const NOW_PLAYING_API_ENDPOINT = 'https://api.spotify.com/v1/me/player/currently-playing';
-
-async function getAccessToken(): Promise<string> {
-    const accessToken = (await window.cookieStore.get(SPOTIFY_ACCESS_TOKEN_COOKIE_NAME))?.value;
-    
-    if (!accessToken) {
-        redirect('/', RedirectType.replace);
-    };
-
-    return accessToken;
-}
 
 export async function nowPlaying():  Promise<SpotifyApiResponseJson | undefined> {
     const accessToken = await getAccessToken();   
