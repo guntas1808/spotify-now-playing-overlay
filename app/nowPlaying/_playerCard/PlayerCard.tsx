@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { RefObject, useEffect, useReducer, useRef } from 'react';
+import Image from 'next/image';
 import PlayingAnimation from '../_playingAnimation/PlayingAnimation';
 import { getActualPlayerUpdate, getExpectedPlayerUpdate, getStyles } from './helper';
 import { PlayerCardType, Props, Styles } from './player-card.types';
@@ -40,7 +41,7 @@ const PlayerCard = (props: Props) => {
     const playerCard = useRef<PlayerCardType | undefined>(undefined);
     const [t, dispatch] = useReducer(t => t + 1, 0);
 
-    useEffect(() => updatePlayer(t, styles, playerCard), [t])
+    useEffect(() => updatePlayer(t, styles, playerCard), [t, styles])
     setTimeout(dispatch, RE_RENDER_INTERVAL_MILLIS)
     
     if (!playerCard.current || !playerCard.current.player.isPlaying) {
@@ -79,9 +80,12 @@ const PlayerCard = (props: Props) => {
                 >
                 <figure className='p-6 pr-0 relative'>
                     {playerCard.current.player.trackImageUri &&
-                        <img id='player-card-image' className=' shadow-lg shadow-base-300 rounded-xl max-w-80 max-h-80'
-                            src={playerCard.current.player.trackImageUri} 
-                            alt=''/>
+                        <Image id='player-card-image' className=' shadow-lg shadow-base-300 rounded-xl max-w-80 max-h-80'
+                            src={playerCard.current.player.trackImageUri}
+                            width={320}
+                            height={320}
+                            unoptimized
+                            alt='' />
                     }
                     <PlayingAnimation color={playerCard.current.styles.txt.color}/>
                 </figure>

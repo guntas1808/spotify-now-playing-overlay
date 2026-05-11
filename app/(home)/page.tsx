@@ -13,7 +13,6 @@ async function handleLogin() {
   // Spotify does not allow 'localhost' in redirect URIs. Use the loopback IP instead.
   origin = origin.replace(/^http:\/\/localhost/, 'http://127.0.0.1');
   const redirectUri = `${origin}/redirect`;
-  console.log(origin);
 
   const verifier = crypto.randomBytes(64).toString('base64url');
   const challenge = crypto.createHash('sha256').update(verifier).digest('base64url');

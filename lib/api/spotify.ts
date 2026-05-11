@@ -9,11 +9,11 @@ export async function nowPlaying():  Promise<SpotifyApiResponseJson | undefined>
     const queryParams = new URLSearchParams(location.search);
     const code = queryParams.get('code');
     
-    let accessToken = (await (window as any).cookieStore.get(SPOTIFY_TOKEN_COOKIE_NAME))?.value;
+    let accessToken = (await window.cookieStore.get(SPOTIFY_TOKEN_COOKIE_NAME))?.value;
 
     // If no token exists but an auth code is present, exchange it using PKCE
     if (!accessToken && code) {
-        const verifier = (await (window as any).cookieStore.get('spotify_code_verifier'))?.value;
+        const verifier = (await window.cookieStore.get('spotify_code_verifier'))?.value;
         if (verifier) {
             accessToken = await exchangeCodeForToken(code, verifier);
             // Clear the code from the URL to prevent re-exchange attempts
@@ -50,11 +50,10 @@ async function exchangeCodeForToken(code: string, verifier: string): Promise<str
             code_verifier: verifier,
         }),
     });
-    console.log(location.origin);
     if (response.ok) {
         const data = await response.json();
-        await (window as any).cookieStore.set(SPOTIFY_TOKEN_COOKIE_NAME, data.access_token);
-        await (window as any).cookieStore.delete('spotify_code_verifier');
+        await window.cookieStore.set(SPOTIFY_TOKEN_COOKIE_NAME, data.access_token);
+        await window.cookieStore.delete('spotify_code_verifier');
         return data.access_token;
     }
     return undefined;
